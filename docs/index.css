@@ -1,0 +1,21 @@
+/* index.css */
+body {
+  background-color: #1a1a1a;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Arial", sans-serif;
+}
+
+a:hover {
+  transition: background-color 0.3s ease;
+}
+
+/* Custom button styling */
+.bg-pink-600:hover {
+  background-color: #e60073;
+}
+
+/* Add any other custom styling here */
