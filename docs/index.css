@@ -1,21 +1,100 @@
-/* index.css */
-body {
-  background-color: #1a1a1a;
+/* Base styles */
+body,
+html {
+  background: #111115;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: white;
+  overflow: hidden;
 }
 
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Typography */
 h1,
 h2,
 h3 {
   font-family: "Arial", sans-serif;
 }
 
+/* Animations */
 a:hover {
   transition: background-color 0.3s ease;
 }
 
-/* Custom button styling */
 .bg-pink-600:hover {
   background-color: #e60073;
 }
 
-/* Add any other custom styling here */
+/* Heart Animation */
+.heart {
+  font-size: 6em;
+  position: relative;
+  color: #e63946;
+  width: 200px; /* Increased from 100px */
+  height: 200px; /* Increased from 100px */
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heartbeat {
+  position: relative;
+  z-index: 1;
+  animation: beat 2s linear infinite;
+  display: block;
+  line-height: 1;
+}
+
+.heartecho {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: echo 2s linear infinite;
+  color: #ff4e4e;
+  line-height: 1;
+}
+
+@keyframes beat {
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(0.9);
+  }
+  21% {
+    transform: scale(1.1) skew(0.004turn);
+  }
+  28% {
+    transform: scale(1) skew(0.008turn);
+  }
+  35% {
+    transform: scale(1) skew(0);
+  }
+}
+
+@keyframes echo {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  14% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  21% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
+  }
+}
