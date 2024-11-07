@@ -1,5 +1,4 @@
 // docs/src/js/main.js
-
 class LoadingManager {
   static removeLoadingOverlay() {
     const loadingOverlay = document.querySelector(".loading-overlay");
@@ -30,13 +29,16 @@ class MainController {
 
   async init() {
     try {
+      // Check dependencies
       if (!window.jQuery || !jQuery.fn.ripples) {
         throw new Error("Required dependencies not loaded");
       }
 
+      // Initialize animations
       const { AnimationController } = await import("./animations.js");
       this.animations = new AnimationController();
 
+      // Initialize other components
       this.initializeThemeToggle();
       this.initializeFeatureCards();
     } catch (error) {
@@ -60,6 +62,7 @@ class MainController {
         );
       });
 
+      // Load saved theme
       const savedTheme = localStorage.getItem("theme");
       if (savedTheme) {
         document.body.classList.toggle("theme-light", savedTheme === "light");
@@ -95,6 +98,7 @@ class MainController {
   }
 }
 
+// Initialize the application
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => new MainController());
 } else {

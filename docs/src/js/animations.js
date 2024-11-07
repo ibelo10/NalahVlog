@@ -7,15 +7,30 @@ export class AnimationController {
     this.rippleInterval = null;
     this.isRippleEnabled = true;
     this.lastRippleTime = 0;
+    this.backgroundImage = "/docs/Images/landingBG.jpg";
     this.init();
   }
 
-  init() {
+  async init() {
     try {
+      await this.preloadBackgroundImage();
       this.initializeRipples();
     } catch (error) {
+      console.error("Initialization error:", error);
       LoadingManager.handleError(error);
     }
+  }
+
+  async preloadBackgroundImage() {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = () => {
+        console.error("Failed to load background image");
+        reject(new Error("Background image failed to load"));
+      };
+      img.src = this.backgroundImage;
+    });
   }
 
   initializeRipples() {
@@ -23,14 +38,14 @@ export class AnimationController {
       this.$rippleContainer = jQuery(".smoke-ripple-container");
       if (this.$rippleContainer.length) {
         this.$rippleContainer.ripples({
-          resolution: 512,
-          dropRadius: 35,
-          perturbance: 0.02,
+          resolution: 512, // Higher resolution for smoother smoke
+          dropRadius: 35, // Larger radius for smoke-like effect
+          perturbance: 0.02, // Lower perturbance for gentler movement
           interactive: true,
-          imageUrl: "/docs/Images/landingBG.jpg", // Background image for ripple effect
+          imageUrl: this.backgroundImage,
         });
 
-        // Enhance smoke effect
+        // Add smoke-specific styles
         const canvas = this.$rippleContainer.find("canvas");
         if (canvas.length) {
           canvas.css({
@@ -40,8 +55,10 @@ export class AnimationController {
           });
         }
 
+        // Initialize effects
         this.startAutoRipples();
         this.addMouseEffects();
+        this.addResizeHandler();
       }
     } catch (error) {
       console.error("Ripples initialization failed:", error);
@@ -54,12 +71,13 @@ export class AnimationController {
       clearInterval(this.rippleInterval);
     }
 
+    // Create smoke effect at intervals
     this.rippleInterval = setInterval(() => {
       if (!this.isRippleEnabled) return;
       this.generateSmokeEffect();
     }, 4000);
 
-    // Initial smoke effects
+    // Initial effects
     for (let i = 0; i < 3; i++) {
       setTimeout(() => this.generateSmokeEffect(), i * 800);
     }
@@ -73,7 +91,7 @@ export class AnimationController {
       const height = this.$rippleContainer.outerHeight();
 
       if (width && height) {
-        // Create multiple smoke points
+        // Generate multiple drops for volumetric smoke effect
         for (let i = 0; i < 3; i++) {
           const x = Math.random() * width;
           const y = Math.random() * height;
@@ -123,6 +141,18 @@ export class AnimationController {
           }
         }, i * 50);
       }
+    });
+  }
+
+  addResizeHandler() {
+    let resizeTimeout;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (this.$rippleContainer?.length && this.isRippleEnabled) {
+          this.$rippleContainer.ripples("updateSize");
+        }
+      }, 250);
     });
   }
 
