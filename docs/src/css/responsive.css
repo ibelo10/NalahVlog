@@ -1,0 +1,51 @@
+/* src/css/responsive.css */
+/* Desktop-first approach */
+@media (min-width: 1920px) {
+  .content-container {
+    max-width: 1000px;
+  }
+
+  .background-slide {
+    background-size: contain;
+  }
+}
+
+@media (min-width: 1024px) {
+  .background-slide {
+    background-size: contain;
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 1023px) {
+  .background-slide {
+    background-size: cover;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-container {
+    width: 95%;
+    padding: 10px;
+  }
+}
+
+@media (max-height: 600px) {
+  .heart {
+    font-size: clamp(3em, 6vw, 4em);
+    width: min(150px, 15vw);
+    height: min(150px, 15vw);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+}
+
+/* High DPI Screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .background-slide {
+    background-size: contain;
+  }
+}

@@ -3,53 +3,95 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Naughty Nalah's Playhouse - Exclusive content and unforgettable experiences"
+    />
     <title>Naughty Nalah's Playhouse</title>
+
+    <!-- Stylesheets -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
     />
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="src/css/base.css" />
   </head>
-  <body class="font-sans leading-normal tracking-normal">
+  <body class="theme-dark font-sans leading-normal tracking-normal">
+    <!-- Loading Overlay -->
+    <div
+      class="loading-overlay fixed inset-0 bg-black z-50 flex items-center justify-center"
+    >
+      <div class="heart">
+        <span class="heartbeat">❤️</span>
+      </div>
+    </div>
+
     <!-- Background Slideshow -->
     <div class="background-container">
       <div
         class="background-slide active"
         style="background-image: url('Images/landingBG.jpg')"
+        aria-hidden="true"
       ></div>
       <div
         class="background-slide"
         style="background-image: url('Images/slide2.jpg')"
+        aria-hidden="true"
       ></div>
       <div
         class="background-slide"
         style="background-image: url('Images/slide3.jpg')"
+        aria-hidden="true"
       ></div>
     </div>
 
-    <!-- Content Section -->
-    <section class="text-center py-16 content-container">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="heart">
-          <span class="heartbeat">❤️</span>
-          <span class="heartecho">❤️</span>
+    <!-- Main Content -->
+    <main class="min-h-screen flex items-center justify-center relative z-10">
+      <section class="text-center py-16 content-container">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Heart Animation -->
+          <div class="heart-container">
+            <div class="heart">
+              <span class="heartbeat">❤️</span>
+              <span class="heartecho">❤️</span>
+            </div>
+          </div>
+
+          <!-- Hero Content -->
+          <div class="mt-8 space-y-6 animate-fadeIn">
+            <div class="title-wrapper">
+              <h1 class="animated-title text-5xl font-extrabold text-pink-600">
+                Naughty Nalah's Playhouse
+              </h1>
+            </div>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+              Discover exclusive content and unforgettable experiences with
+              Nalah.
+            </p>
+
+            <!-- CTA Button -->
+            <div class="mt-8">
+              <a
+                href="home.html"
+                class="button-primary inline-block text-white px-6 py-3 rounded-full text-lg font-semibold hover:transform hover:scale-105 transition-all duration-300"
+              >
+                Book Now
+              </a>
+            </div>
+          </div>
         </div>
+      </section>
+    </main>
 
-        <h1 class="mt-6 text-5xl font-extrabold text-pink-600">
-          Naughty Nalah's Playhouse
-        </h1>
-        <p class="mt-4 text-lg text-gray-400">
-          Discover exclusive content and unforgettable experiences with Nalah.
-        </p>
-        <a
-          href="home.html"
-          class="mt-8 inline-block bg-pink-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-pink-700"
-        >
-          Book Now
-        </a>
-      </div>
-    </section>
+    <!-- Theme Toggle -->
+    <button
+      id="themeToggle"
+      class="fixed bottom-4 right-4 p-2 rounded-full bg-gray-800 text-white shadow-effect transition-effect"
+      aria-label="Toggle theme"
+    >
+      🌓
+    </button>
 
-    <script src="index.js"></script>
+    <script type="module" src="src/js/main.js"></script>
   </body>
 </html>

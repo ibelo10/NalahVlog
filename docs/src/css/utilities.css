@@ -1,0 +1,45 @@
+/* src/css/utilities.css */
+.text-center {
+  text-align: center;
+}
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+.mt-6 {
+  margin-top: 1.5rem;
+}
+.mt-8 {
+  margin-top: 2rem;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
+}
+.font-extrabold {
+  font-weight: 800;
+}
+.text-pink-600 {
+  color: var(--color-primary);
+}
+.inline-block {
+  display: inline-block;
+}
+.rounded-full {
+  border-radius: 9999px;
+}
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+.font-semibold {
+  font-weight: 600;
+}

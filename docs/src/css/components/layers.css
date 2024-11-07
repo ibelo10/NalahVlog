@@ -1,0 +1,36 @@
+/* docs/src/css/components/layers.css */
+:root {
+  --layer-background: 1;
+  --layer-content: 10;
+  --layer-overlay: 50;
+}
+
+.background-container {
+  z-index: var(--layer-background);
+}
+
+.content-container {
+  z-index: var(--layer-content);
+}
+
+.loading-overlay {
+  z-index: var(--layer-overlay);
+}
+
+/* 3D space management */
+.scene {
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+}
+
+.content-wrapper {
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+/* Performance optimizations */
+.hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}

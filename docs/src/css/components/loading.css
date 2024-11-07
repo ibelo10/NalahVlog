@@ -1,0 +1,24 @@
+/* docs/src/css/components/loading.css */
+.loading-overlay {
+  background-color: rgba(0, 0, 0, 0.9);
+  transition: opacity 0.5s ease-in-out;
+}
+
+.loading-overlay .heart {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

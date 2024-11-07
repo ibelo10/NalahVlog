@@ -1,0 +1,12 @@
+/* docs/src/css/components/buttons.css */
+.button-primary {
+  background-color: rgba(236, 72, 153, 0.9);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.button-primary:hover {
+  background-color: rgba(236, 72, 153, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+}

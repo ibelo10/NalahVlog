@@ -1,0 +1,11 @@
+/* src/css/variables.css */
+:root {
+  --color-primary: rgba(236, 72, 153, 1);
+  --color-primary-transparent: rgba(236, 72, 153, 0.9);
+  --color-text: white;
+  --gradient-overlay: linear-gradient(
+    rgba(17, 17, 21, 0.65),
+    rgba(17, 17, 21, 0.7) 50%,
+    rgba(17, 17, 21, 0.8)
+  );
+}

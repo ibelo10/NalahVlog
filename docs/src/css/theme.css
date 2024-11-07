@@ -1,0 +1,14 @@
+/* src/css/theme.css */
+.theme-dark {
+  --bg-primary: rgb(17, 17, 21);
+  --bg-secondary: rgb(28, 28, 35);
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+.theme-light {
+  --bg-primary: rgb(255, 255, 255);
+  --bg-secondary: rgb(245, 245, 247);
+  --text-primary: rgb(0, 0, 0);
+  --text-secondary: rgba(0, 0, 0, 0.7);
+}

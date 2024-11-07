@@ -1,0 +1,91 @@
+/* docs/src/css/components/background.css */
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #1a1a1a;
+}
+
+.background-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.background-slide::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(17, 17, 21, 0.65),
+    rgba(17, 17, 21, 0.7) 50%,
+    rgba(17, 17, 21, 0.8)
+  );
+}
+
+.background-slide.active {
+  opacity: 1;
+}
+
+/* docs/src/css/components/heart.css */
+.heart-container {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+
+.heart {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heartbeat {
+  font-size: 4rem;
+  position: relative;
+  z-index: 2;
+  animation: beat 2s ease-in-out infinite;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(230, 57, 70, 0.3));
+}
+
+.heartecho {
+  font-size: 4rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: echo 2s ease-in-out infinite;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* docs/src/css/components/buttons.css */
+.button-primary {
+  background-color: rgba(236, 72, 153, 0.9);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.button-primary:hover {
+  background-color: rgba(236, 72, 153, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+}

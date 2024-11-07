@@ -1,0 +1,79 @@
+/* docs/src/css/components/content.css */
+.content-container {
+  position: relative;
+  z-index: 10;
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.content-container > * {
+  transform: translateZ(50px);
+}
+
+.heart-container {
+  position: relative;
+  transform: translateZ(75px);
+}
+
+.animated-title {
+  position: relative;
+  transform: translateZ(100px);
+  transform-style: preserve-3d;
+}
+
+.button-primary {
+  position: relative;
+  transform: translateZ(25px);
+}
+
+/* Update background styles */
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.background-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.background-slide::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6));
+  z-index: 2;
+}
+
+.background-slide.active {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content-container > *,
+  .heart-container,
+  .animated-title,
+  .button-primary {
+    transform: none !important;
+  }
+}
