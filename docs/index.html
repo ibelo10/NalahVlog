@@ -14,7 +14,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
     />
-    <link rel="stylesheet" href="src/css/base.css" />
+    <!-- Fix CSS path -->
+    <link rel="stylesheet" href="/docs/src/css/base.css" />
   </head>
   <body
     class="theme-dark font-sans leading-normal tracking-normal min-h-screen overflow-x-hidden"
@@ -35,19 +36,42 @@
     </div>
 
     <!-- Main Content -->
-    <main>
-      <!-- Title Section -->
-      <div class="text-center mt-8 space-y-6">
-        <h1 class="text-5xl sm:text-6xl font-extrabold text-pink-500">
+    <main
+      class="relative min-h-screen flex items-center justify-center z-10 px-4 py-16"
+    >
+      <div class="container mx-auto max-w-6xl text-center">
+        <!-- Title Section -->
+        <h1 class="text-5xl sm:text-6xl font-extrabold text-pink-500 mb-6">
           Naughty Nalah's Playhouse
         </h1>
 
         <p
-          class="text-lg sm:text-xl text-pink-200 mx-auto font-light leading-relaxed max-w-2xl"
+          class="text-lg sm:text-xl text-pink-200 mx-auto font-light leading-relaxed max-w-2xl mb-12"
         >
           Discover exclusive content and unforgettable experiences with
           <span class="font-medium text-pink-400">Nalah</span>
         </p>
+
+        <!-- Features Grid -->
+        <div class="feature-grid mt-12">
+          <div class="feature-card">
+            <span class="feature-icon">👄</span>
+            <span class="feature-text">Exclusive Content</span>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">💫</span>
+            <span class="feature-text">Private Shows</span>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">✨</span>
+            <span class="feature-text">Special Requests</span>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="mt-12">
+          <a href="home.html" class="cta-button"> Enter Now </a>
+        </div>
       </div>
     </main>
 
@@ -60,65 +84,74 @@
       🌙
     </button>
 
-    <!-- Load jQuery first -->
-    <script
-      src="https://code.jquery.com/jquery-3.6.0.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <!-- Scripts -->
+    <!-- Replace the scripts section in index.html -->
 
-    <!-- Initialize app after jQuery loads -->
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      window.addEventListener("load", function checkJQuery() {
-        if (window.jQuery) {
-          const rippleScript = document.createElement("script");
-          rippleScript.src =
-            "https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js";
+      // Wait for DOM to be ready
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load ripples plugin
+        function loadRipples() {
+          return new Promise((resolve, reject) => {
+            const rippleScript = document.createElement("script");
+            rippleScript.src =
+              "https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js";
+            rippleScript.onload = resolve;
+            rippleScript.onerror = reject;
+            document.body.appendChild(rippleScript);
+          });
+        }
 
-          rippleScript.onload = function () {
-            import("./src/js/main.js")
-              .then(() => {
-                const loadingOverlay =
-                  document.querySelector(".loading-overlay");
-                if (loadingOverlay) {
-                  loadingOverlay.style.opacity = "0";
-                  setTimeout(() => {
-                    loadingOverlay.style.display = "none";
-                  }, 500);
-                }
-              })
-              .catch((error) => {
-                console.error("Error loading main script:", error);
-                handleLoadingError();
-              });
-          };
+        // Initialize application
+        async function initApp() {
+          try {
+            // Check jQuery
+            if (!window.jQuery) {
+              throw new Error("jQuery not loaded");
+            }
 
-          rippleScript.onerror = function () {
-            console.error("Failed to load ripples plugin");
+            // Load ripples plugin
+            await loadRipples();
+
+            // Import main.js
+            await import("/docs/src/js/main.js");
+
+            // Remove loading overlay
+            const loadingOverlay = document.querySelector(".loading-overlay");
+            if (loadingOverlay) {
+              loadingOverlay.style.opacity = "0";
+              setTimeout(() => {
+                loadingOverlay.style.display = "none";
+              }, 500);
+            }
+          } catch (error) {
+            console.error("Initialization error:", error);
             handleLoadingError();
-          };
-
-          document.body.appendChild(rippleScript);
-        } else {
-          console.error("jQuery not loaded");
-          handleLoadingError();
+          }
         }
+
+        // Error handler
+        function handleLoadingError() {
+          const loadingOverlay = document.querySelector(".loading-overlay");
+          if (loadingOverlay) {
+            loadingOverlay.style.opacity = "0";
+            setTimeout(() => {
+              loadingOverlay.style.display = "none";
+            }, 500);
+          }
+          document
+            .querySelector(".background-container")
+            ?.classList.add("fallback");
+        }
+
+        // Start initialization
+        initApp();
+
+        // Failsafe for loading overlay
+        setTimeout(handleLoadingError, 5000);
       });
-
-      function handleLoadingError() {
-        document
-          .querySelector(".background-container")
-          ?.classList.add("fallback");
-        const loadingOverlay = document.querySelector(".loading-overlay");
-        if (loadingOverlay) {
-          loadingOverlay.style.opacity = "0";
-          setTimeout(() => {
-            loadingOverlay.style.display = "none";
-          }, 500);
-        }
-      }
-
-      // Failsafe for loading overlay
-      setTimeout(handleLoadingError, 5000);
     </script>
   </body>
 </html>

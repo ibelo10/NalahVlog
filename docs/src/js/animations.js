@@ -13,68 +13,92 @@ export class AnimationController {
 
   async init() {
     try {
+      // Wait for image to load before initializing ripples
       await this.preloadBackgroundImage();
-      this.initializeRipples();
+
+      // Initialize ripples effect
+      await this.initializeRipples();
+
+      // Start animations if successful
+      if (this.isRippleEnabled) {
+        this.startAutoRipples();
+        this.addMouseEffects();
+      }
     } catch (error) {
-      console.error("Initialization error:", error);
-      LoadingManager.handleError(error);
+      console.error("Animation initialization error:", error);
+      this.handleRippleError();
     }
   }
 
   async preloadBackgroundImage() {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = resolve;
+
+      img.onload = () => {
+        console.log("Background image loaded successfully");
+        resolve();
+      };
+
       img.onerror = () => {
         console.error("Failed to load background image");
         reject(new Error("Background image failed to load"));
       };
+
       img.src = this.backgroundImage;
     });
   }
 
-  initializeRipples() {
+  async initializeRipples() {
+    if (!this.isRippleEnabled) return;
+
     try {
       this.$rippleContainer = jQuery(".smoke-ripple-container");
-      if (this.$rippleContainer.length) {
-        this.$rippleContainer.ripples({
-          resolution: 512, // Higher resolution for smoother smoke
-          dropRadius: 35, // Larger radius for smoke-like effect
-          perturbance: 0.02, // Lower perturbance for gentler movement
-          interactive: true,
-          imageUrl: this.backgroundImage,
-        });
 
-        // Add smoke-specific styles
-        const canvas = this.$rippleContainer.find("canvas");
-        if (canvas.length) {
-          canvas.css({
-            opacity: "0.7",
-            filter: "blur(4px) contrast(1.5)",
-            mixBlendMode: "screen",
-          });
-        }
-
-        // Initialize effects
-        this.startAutoRipples();
-        this.addMouseEffects();
-        this.addResizeHandler();
+      if (!this.$rippleContainer.length) {
+        throw new Error("Ripple container not found");
       }
+
+      // Initialize ripples with optimal settings
+      this.$rippleContainer.ripples({
+        resolution: 512,
+        dropRadius: 35,
+        perturbance: 0.02,
+        interactive: true,
+        crossOrigin: "",
+      });
+
+      // Add canvas styles
+      const canvas = this.$rippleContainer.find("canvas");
+      if (canvas.length) {
+        canvas.css({
+          opacity: "0.7",
+          filter: "blur(4px) contrast(1.5)",
+          mixBlendMode: "screen",
+        });
+      }
+
+      // Add resize handler
+      this.addResizeHandler();
     } catch (error) {
       console.error("Ripples initialization failed:", error);
-      LoadingManager.addFallbackBackground();
+      this.handleRippleError();
+      throw error;
     }
   }
 
   startAutoRipples() {
+    if (!this.isRippleEnabled || !this.$rippleContainer?.length) return;
+
+    // Clear any existing interval
     if (this.rippleInterval) {
       clearInterval(this.rippleInterval);
     }
 
-    // Create smoke effect at intervals
+    // Create new interval for smoke effect
     this.rippleInterval = setInterval(() => {
-      if (!this.isRippleEnabled) return;
-      this.generateSmokeEffect();
+      if (this.isRippleEnabled) {
+        this.generateSmokeEffect();
+      }
     }, 4000);
 
     // Initial effects
@@ -91,7 +115,6 @@ export class AnimationController {
       const height = this.$rippleContainer.outerHeight();
 
       if (width && height) {
-        // Generate multiple drops for volumetric smoke effect
         for (let i = 0; i < 3; i++) {
           const x = Math.random() * width;
           const y = Math.random() * height;
@@ -99,7 +122,7 @@ export class AnimationController {
           const strength = 0.01 + Math.random() * 0.02;
 
           setTimeout(() => {
-            if (this.isRippleEnabled) {
+            if (this.isRippleEnabled && this.$rippleContainer) {
               this.$rippleContainer.ripples("drop", x, y, dropRadius, strength);
             }
           }, i * 100);
@@ -112,7 +135,7 @@ export class AnimationController {
   }
 
   addMouseEffects() {
-    if (!this.$rippleContainer?.length) return;
+    if (!this.$rippleContainer?.length || !this.isRippleEnabled) return;
 
     this.$rippleContainer.on("mousemove", (e) => {
       if (!this.isRippleEnabled) return;
@@ -121,16 +144,16 @@ export class AnimationController {
       if (now - this.lastRippleTime < 50) return;
       this.lastRippleTime = now;
 
-      const x = e.pageX - this.$rippleContainer.offset().left;
-      const y = e.pageY - this.$rippleContainer.offset().top;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-      // Create interactive smoke trail
       for (let i = 0; i < 2; i++) {
         const offsetX = (Math.random() - 0.5) * 20;
         const offsetY = (Math.random() - 0.5) * 20;
 
         setTimeout(() => {
-          if (this.isRippleEnabled) {
+          if (this.isRippleEnabled && this.$rippleContainer) {
             this.$rippleContainer.ripples(
               "drop",
               x + offsetX,
@@ -170,7 +193,11 @@ export class AnimationController {
     if (this.$rippleContainer?.length) {
       this.$rippleContainer.off("mousemove");
       if (typeof this.$rippleContainer.ripples === "function") {
-        this.$rippleContainer.ripples("destroy");
+        try {
+          this.$rippleContainer.ripples("destroy");
+        } catch (error) {
+          console.error("Error destroying ripples:", error);
+        }
       }
     }
 

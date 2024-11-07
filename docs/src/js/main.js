@@ -11,7 +11,10 @@ class LoadingManager {
   }
 
   static addFallbackBackground() {
-    document.querySelector(".background-container")?.classList.add("fallback");
+    const container = document.querySelector(".background-container");
+    if (container && !container.classList.contains("fallback")) {
+      container.classList.add("fallback");
+    }
   }
 
   static handleError(error) {
@@ -24,14 +27,20 @@ class LoadingManager {
 class MainController {
   constructor() {
     this.animations = null;
-    this.init();
+    this.initialized = false;
   }
 
   async init() {
+    if (this.initialized) return;
+
     try {
-      // Check dependencies
-      if (!window.jQuery || !jQuery.fn.ripples) {
-        throw new Error("Required dependencies not loaded");
+      // Verify jQuery and ripples are available
+      if (typeof jQuery === "undefined") {
+        throw new Error("jQuery not loaded");
+      }
+
+      if (typeof jQuery.fn.ripples === "undefined") {
+        throw new Error("Ripples plugin not loaded");
       }
 
       // Initialize animations
@@ -41,6 +50,8 @@ class MainController {
       // Initialize other components
       this.initializeThemeToggle();
       this.initializeFeatureCards();
+
+      this.initialized = true;
     } catch (error) {
       LoadingManager.handleError(error);
     }
@@ -48,31 +59,30 @@ class MainController {
 
   initializeThemeToggle() {
     const themeToggle = document.getElementById("themeToggle");
-    if (themeToggle) {
-      themeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("theme-light");
-        themeToggle.textContent = document.body.classList.contains(
-          "theme-light"
-        )
-          ? "☀️"
-          : "🌙";
-        localStorage.setItem(
-          "theme",
-          document.body.classList.contains("theme-light") ? "light" : "dark"
-        );
-      });
+    if (!themeToggle) return;
 
-      // Load saved theme
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme) {
-        document.body.classList.toggle("theme-light", savedTheme === "light");
-        themeToggle.textContent = savedTheme === "light" ? "☀️" : "🌙";
-      }
+    const updateTheme = (isLight) => {
+      document.body.classList.toggle("theme-light", isLight);
+      themeToggle.textContent = isLight ? "☀️" : "🌙";
+      localStorage.setItem("theme", isLight ? "light" : "dark");
+    };
+
+    // Handle click events
+    themeToggle.addEventListener("click", () => {
+      const isLight = !document.body.classList.contains("theme-light");
+      updateTheme(isLight);
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      updateTheme(savedTheme === "light");
     }
   }
 
   initializeFeatureCards() {
     const cards = document.querySelectorAll(".feature-card");
+    if (!cards.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -95,14 +105,18 @@ class MainController {
     if (this.animations) {
       this.animations.destroy();
     }
+    this.initialized = false;
   }
 }
 
-// Initialize the application
+// Initialize when DOM is ready
+const controller = new MainController();
+
+// Ensure DOM is loaded before initialization
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => new MainController());
+  document.addEventListener("DOMContentLoaded", () => controller.init());
 } else {
-  new MainController();
+  controller.init();
 }
 
-export { LoadingManager };
+export { LoadingManager, MainController };
