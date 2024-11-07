@@ -23,29 +23,15 @@
     <div
       class="loading-overlay fixed inset-0 bg-black z-50 flex items-center justify-center"
     >
-      <div class="heart">
-        <span class="heartbeat">💋</span>
+      <div class="loading-spinner">
+        <span class="sr-only">Loading...</span>
       </div>
     </div>
 
-    <!-- Background Slideshow -->
+    <!-- Background Container -->
     <div class="background-container fixed inset-0">
-      <div class="sensual-overlay"></div>
-      <div
-        class="background-slide active"
-        style="background-image: url('Images/landingBG.jpg')"
-        aria-hidden="true"
-      ></div>
-      <div
-        class="background-slide"
-        style="background-image: url('Images/slide2.jpg')"
-        aria-hidden="true"
-      ></div>
-      <div
-        class="background-slide"
-        style="background-image: url('Images/slide3.jpg')"
-        aria-hidden="true"
-      ></div>
+      <div class="smoke-ripple-container"></div>
+      <div class="smoke-overlay"></div>
     </div>
 
     <!-- Main Content -->
@@ -53,59 +39,42 @@
       class="relative min-h-screen flex items-center justify-center z-10 px-4 py-16"
     >
       <div class="container mx-auto max-w-6xl">
-        <section class="text-center">
-          <!-- Heart Animation -->
-          <div class="heart-container glow-effect mb-8">
-            <div class="heart">
-              <span class="heartbeat">💋</span>
-              <span class="heartecho">💋</span>
+        <!-- Centered Content -->
+        <div class="text-center space-y-6">
+          <h1
+            class="text-5xl sm:text-6xl font-extrabold text-pink-500 animate-glow"
+          >
+            Naughty Nalah's Playhouse
+          </h1>
+
+          <p
+            class="text-lg sm:text-xl text-pink-200 mx-auto font-light leading-relaxed max-w-2xl"
+          >
+            Discover exclusive content and unforgettable experiences with
+            <span class="font-medium text-pink-400">Nalah</span>
+          </p>
+
+          <!-- Features Grid -->
+          <div class="feature-grid mt-12">
+            <div class="feature-card">
+              <span class="feature-icon">👄</span>
+              <span class="feature-text">Exclusive Content</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">💫</span>
+              <span class="feature-text">Private Shows</span>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">✨</span>
+              <span class="feature-text">Special Requests</span>
             </div>
           </div>
 
-          <!-- Hero Content -->
-          <div class="space-y-8 animate-fadeIn">
-            <div class="title-wrapper">
-              <h1 class="animated-title text-5xl sm:text-6xl font-extrabold">
-                Naughty Nalah's Playhouse
-              </h1>
-            </div>
-
-            <p
-              class="text-lg sm:text-xl text-pink-200 mx-auto font-light leading-relaxed max-w-2xl"
-            >
-              Discover exclusive content and unforgettable experiences with
-              <span class="font-medium text-pink-400">Nalah</span>
-            </p>
-
-            <!-- Features -->
-            <div
-              class="flex justify-center gap-4 sm:gap-8 mt-6 text-pink-300/80"
-            >
-              <div class="feature-item">
-                <span class="text-xl sm:text-2xl">👄</span>
-                <p class="text-xs sm:text-sm mt-2">Exclusive Content</p>
-              </div>
-              <div class="feature-item">
-                <span class="text-xl sm:text-2xl">💖</span>
-                <p class="text-xs sm:text-sm mt-2">Private Shows</p>
-              </div>
-              <div class="feature-item">
-                <span class="text-xl sm:text-2xl">✨</span>
-                <p class="text-xs sm:text-sm mt-2">Special Requests</p>
-              </div>
-            </div>
-
-            <!-- CTA Button -->
-            <div class="mt-8">
-              <a
-                href="home.html"
-                class="button-primary inline-block text-white px-6 py-3 rounded-full text-lg font-medium"
-              >
-                Enter Now
-              </a>
-            </div>
+          <!-- CTA Button -->
+          <div class="mt-8">
+            <a href="home.html" class="cta-button"> Enter Now </a>
           </div>
-        </section>
+        </div>
       </div>
     </main>
 
@@ -118,6 +87,64 @@
       🌙
     </button>
 
-    <script type="module" src="src/js/main.js"></script>
+    <!-- Load jQuery first -->
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Initialize app after jQuery loads -->
+    <script>
+      window.addEventListener("load", function checkJQuery() {
+        if (window.jQuery) {
+          const rippleScript = document.createElement("script");
+          rippleScript.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js";
+
+          rippleScript.onload = function () {
+            import("./src/js/main.js")
+              .then(() => {
+                const loadingOverlay =
+                  document.querySelector(".loading-overlay");
+                if (loadingOverlay) {
+                  loadingOverlay.style.opacity = "0";
+                  setTimeout(() => {
+                    loadingOverlay.style.display = "none";
+                  }, 500);
+                }
+              })
+              .catch((error) => {
+                console.error("Error loading main script:", error);
+                handleLoadingError();
+              });
+          };
+
+          rippleScript.onerror = function () {
+            console.error("Failed to load ripples plugin");
+            handleLoadingError();
+          };
+
+          document.body.appendChild(rippleScript);
+        } else {
+          console.error("jQuery not loaded");
+          handleLoadingError();
+        }
+      });
+
+      function handleLoadingError() {
+        document
+          .querySelector(".background-container")
+          ?.classList.add("fallback");
+        const loadingOverlay = document.querySelector(".loading-overlay");
+        if (loadingOverlay) {
+          loadingOverlay.style.opacity = "0";
+          setTimeout(() => {
+            loadingOverlay.style.display = "none";
+          }, 500);
+        }
+      }
+
+      setTimeout(handleLoadingError, 5000);
+    </script>
   </body>
 </html>

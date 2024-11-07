@@ -1,11 +1,36 @@
-/* src/css/variables.css */
+/* docs/src/css/variables.css */
 :root {
-  --color-primary: rgba(236, 72, 153, 1);
-  --color-primary-transparent: rgba(236, 72, 153, 0.9);
-  --color-text: white;
-  --gradient-overlay: linear-gradient(
-    rgba(17, 17, 21, 0.65),
-    rgba(17, 17, 21, 0.7) 50%,
-    rgba(17, 17, 21, 0.8)
-  );
+  /* Colors */
+  --primary-neon: #ff69b4;
+  --primary-glow: rgba(255, 105, 180, 0.7);
+  --secondary-neon: #ff00ff;
+  --secondary-glow: rgba(255, 0, 255, 0.7);
+
+  /* Animation Timings */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s;
+  --transition-slow: 0.5s;
+
+  /* Shadows */
+  --neon-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow),
+    0 0 30px var(--primary-glow);
+
+  /* Z-indices */
+  --z-background: -1;
+  --z-content: 1;
+  --z-overlay: 2;
+  --z-modal: 50;
+
+  /* Blur amounts */
+  --blur-sm: 4px;
+  --blur-md: 8px;
+  --blur-lg: 12px;
+}
+
+/* Theme variations */
+.theme-light {
+  --primary-neon: #ff1493;
+  --primary-glow: rgba(255, 20, 147, 0.7);
+  --secondary-neon: #ff69b4;
+  --secondary-glow: rgba(255, 105, 180, 0.7);
 }

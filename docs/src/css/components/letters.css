@@ -27,24 +27,27 @@
   position: relative;
   color: rgb(236, 72, 153);
   font-weight: bold;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   animation: fadeInUp 0.5s ease forwards;
   animation-delay: var(--delay);
+  transform-origin: center;
 }
 
-/* Remove box effect and add smooth glow */
-.word-container:hover {
-  transform: translateY(-2px);
-}
-
+/* New hover effects */
 .word-container:hover .animated-letter {
   color: rgb(244, 114, 182);
-  text-shadow: 0 0 10px rgba(236, 72, 153, 0.7),
-    0 0 20px rgba(236, 72, 153, 0.5), 0 0 30px rgba(236, 72, 153, 0.3);
+  text-shadow: 0 0 15px rgba(236, 72, 153, 0.8);
+  transform: scale(1.1);
 }
 
-/* Underline effect */
+/* Individual letter hover effect */
+.animated-letter:hover {
+  transform: scale(1.2) rotate(var(--random-rotation));
+  color: rgb(251, 146, 203);
+}
+
+/* Smooth underline effect */
 .animated-letter::after {
   content: "";
   position: absolute;
@@ -67,7 +70,6 @@
   transform: scaleX(1);
 }
 
-/* Animation keyframes */
 @keyframes fadeInUp {
   0% {
     opacity: 0;
@@ -79,18 +81,11 @@
   }
 }
 
-/* Word spacing */
 .word-space {
   width: 0.5em;
   display: inline-block;
 }
 
-/* Remove any background effects */
-.word-container::before {
-  display: none;
-}
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .word-container {
     margin: 0.15rem;
@@ -103,21 +98,4 @@
   .word-space {
     width: 0.3em;
   }
-}
-
-/* Theme variations */
-.theme-dark .animated-letter {
-  color: rgb(236, 72, 153);
-}
-
-.theme-dark .word-container:hover .animated-letter {
-  color: rgb(244, 114, 182);
-}
-
-.theme-light .animated-letter {
-  color: rgb(219, 39, 119);
-}
-
-.theme-light .word-container:hover .animated-letter {
-  color: rgb(236, 72, 153);
 }

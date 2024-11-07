@@ -1,36 +1,132 @@
 /* docs/src/css/components/layers.css */
-:root {
-  --layer-background: 1;
-  --layer-content: 10;
-  --layer-overlay: 50;
-}
-
-.background-container {
-  z-index: var(--layer-background);
-}
-
-.content-container {
-  z-index: var(--layer-content);
-}
-
-.loading-overlay {
-  z-index: var(--layer-overlay);
-}
-
-/* 3D space management */
-.scene {
-  perspective: 1000px;
-  perspective-origin: 50% 50%;
-}
-
-.content-wrapper {
-  transform-style: preserve-3d;
+.neon-frame-container {
   position: relative;
+  padding: 2rem;
 }
 
-/* Performance optimizations */
-.hardware-accelerated {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: transform;
+.neon-frame {
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Adjusted for better proportions */
+  margin: 0 auto;
+  aspect-ratio: 3/4; /* Changed to portrait ratio */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.neon-glow {
+  position: absolute;
+  inset: 0;
+  border: 4px solid transparent;
+  border-radius: 8px;
+  animation: neonPulse 2s infinite;
+  box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff,
+    inset 0 0 15px #ff00ff;
+}
+
+.smoke-effect {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 0, 255, 0.2),
+    rgba(128, 0, 128, 0.3),
+    rgba(0, 0, 0, 0.5)
+  );
+  mix-blend-mode: screen;
+  animation: smokeMove 15s infinite alternate;
+  pointer-events: none;
+}
+
+.frame-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.featured-image-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative; /* Added for positioning control */
+}
+
+.featured-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top; /* Focus on upper portion */
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+/* Feature Cards */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 2rem auto 0; /* Added top margin */
+}
+
+.feature-card {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease; /* Changed to all for smoother transitions */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.feature-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .neon-frame {
+    max-width: 320px;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .neon-frame {
+    max-width: 280px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: 1rem;
+  }
 }

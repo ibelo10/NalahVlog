@@ -1,47 +1,104 @@
 // docs/src/js/main.js
-import { Slideshow } from "./slideshow.js";
-import { ParallaxEffect } from "./parallax.js";
-import { HeartAnimation } from "./animations.js";
-import { LetterAnimations } from "./letterAnimations.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Initialize slideshow
-  const slideshow = new Slideshow(".background-slide");
-  slideshow.preloadImages();
-  slideshow.start();
-
-  // Initialize parallax
-  const parallax = new ParallaxEffect(".content-container");
-  parallax.init();
-
-  // Initialize heart animation
-  const heart = new HeartAnimation(".heart");
-  heart.init();
-
-  // Initialize letter animations
-  const titleAnimation = new LetterAnimations(".animated-title");
-
-  // Event listeners for slideshow pause/resume
-  const backgroundContainer = document.querySelector(".background-container");
-  if (backgroundContainer) {
-    backgroundContainer.addEventListener("mouseenter", () => slideshow.pause());
-    backgroundContainer.addEventListener("mouseleave", () => slideshow.start());
-  }
-
-  // Handle loading overlay
-  const loadingOverlay = document.querySelector(".loading-overlay");
-  if (loadingOverlay) {
-    window.addEventListener("load", () => {
+class LoadingManager {
+  static removeLoadingOverlay() {
+    const loadingOverlay = document.querySelector(".loading-overlay");
+    if (loadingOverlay) {
       loadingOverlay.style.opacity = "0";
       setTimeout(() => {
         loadingOverlay.style.display = "none";
       }, 500);
-    });
+    }
   }
 
-  // Cleanup on page unload
-  window.addEventListener("unload", () => {
-    parallax.destroy();
-    heart.destroy();
-  });
-});
+  static addFallbackBackground() {
+    document.querySelector(".background-container")?.classList.add("fallback");
+  }
+
+  static handleError(error) {
+    console.error("Initialization error:", error);
+    this.addFallbackBackground();
+    this.removeLoadingOverlay();
+  }
+}
+
+class MainController {
+  constructor() {
+    this.animations = null;
+    this.init();
+  }
+
+  async init() {
+    try {
+      if (!window.jQuery || !jQuery.fn.ripples) {
+        throw new Error("Required dependencies not loaded");
+      }
+
+      const { AnimationController } = await import("./animations.js");
+      this.animations = new AnimationController();
+
+      this.initializeThemeToggle();
+      this.initializeFeatureCards();
+    } catch (error) {
+      LoadingManager.handleError(error);
+    }
+  }
+
+  initializeThemeToggle() {
+    const themeToggle = document.getElementById("themeToggle");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("theme-light");
+        themeToggle.textContent = document.body.classList.contains(
+          "theme-light"
+        )
+          ? "☀️"
+          : "🌙";
+        localStorage.setItem(
+          "theme",
+          document.body.classList.contains("theme-light") ? "light" : "dark"
+        );
+      });
+
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.body.classList.toggle("theme-light", savedTheme === "light");
+        themeToggle.textContent = savedTheme === "light" ? "☀️" : "🌙";
+      }
+    }
+  }
+
+  initializeFeatureCards() {
+    const cards = document.querySelectorAll(".feature-card");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "50px",
+      }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+  }
+
+  destroy() {
+    if (this.animations) {
+      this.animations.destroy();
+    }
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => new MainController());
+} else {
+  new MainController();
+}
+
+export { LoadingManager };
