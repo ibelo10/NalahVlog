@@ -11,7 +11,24 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body class="font-sans leading-normal tracking-normal">
-    <section class="text-center py-16">
+    <!-- Background Slideshow -->
+    <div class="background-container">
+      <div
+        class="background-slide active"
+        style="background-image: url('Images/landingBG.jpg')"
+      ></div>
+      <div
+        class="background-slide"
+        style="background-image: url('Images/slide2.jpg')"
+      ></div>
+      <div
+        class="background-slide"
+        style="background-image: url('Images/slide3.jpg')"
+      ></div>
+    </div>
+
+    <!-- Content Section -->
+    <section class="text-center py-16 content-container">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="heart">
           <span class="heartbeat">❤️</span>
@@ -32,6 +49,7 @@
         </a>
       </div>
     </section>
+
     <script src="index.js"></script>
   </body>
 </html>

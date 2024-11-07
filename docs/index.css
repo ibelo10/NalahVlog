@@ -12,18 +12,62 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(
-      rgba(17, 17, 21, 0.65),
-      rgba(17, 17, 21, 0.7) 50%,
-      rgba(17, 17, 21, 0.8)
-    ),
-    url("Images/landingBG.jpg");
+}
+
+/* Background Slideshow Styles */
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.background-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
   background-size: 100% auto;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+.background-slide::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(17, 17, 21, 0.65),
+    rgba(17, 17, 21, 0.7) 50%,
+    rgba(17, 17, 21, 0.8)
+  );
+}
+
+.background-slide.active {
+  opacity: 1;
+  animation: kenBurns 20s infinite alternate;
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate(0);
+  }
+  50% {
+    transform: scale(1.1) translate(-2%, -2%);
+  }
+  100% {
+    transform: scale(1) translate(0);
+  }
 }
 
 /* Typography */
@@ -37,6 +81,14 @@ p {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   letter-spacing: 0.5px;
   font-weight: 300;
+}
+
+/* Content Container */
+.content-container {
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 /* Heart Animation */
@@ -71,7 +123,7 @@ p {
   filter: drop-shadow(0 0 8px rgba(255, 78, 78, 0.4));
 }
 
-/* Refined animations */
+/* Heart Animations */
 @keyframes beat {
   0% {
     transform: scale(1);
@@ -125,7 +177,7 @@ p {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  body {
+  .background-slide {
     background-size: auto 100vh;
   }
 
@@ -139,7 +191,7 @@ p {
 }
 
 @media (min-width: 1920px) {
-  body {
+  .background-slide {
     background-size: cover;
   }
 }
