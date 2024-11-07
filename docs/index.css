@@ -1,7 +1,6 @@
 /* Base styles */
 body,
 html {
-  background: #111115;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -13,6 +12,28 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: linear-gradient(rgba(17, 17, 21, 0.75), rgba(17, 17, 21, 0.75)),
+    url("Images/landingBG.jpg");
+  background-size: 100% auto; /* Changed from 'cover' to maintain image quality */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  image-rendering: -webkit-optimize-contrast; /* Improves image sharpness on webkit browsers */
+  image-rendering: crisp-edges; /* Modern browsers */
+}
+
+/* For high-resolution displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  body {
+    background-size: 50% auto; /* Adjust for retina displays */
+  }
+}
+
+/* Alternative background sizing for different screen aspects */
+@media (max-aspect-ratio: 16/9) {
+  body {
+    background-size: auto 100vh;
+  }
 }
 
 /* Typography */
@@ -22,22 +43,13 @@ h3 {
   font-family: "Arial", sans-serif;
 }
 
-/* Animations */
-a:hover {
-  transition: background-color 0.3s ease;
-}
-
-.bg-pink-600:hover {
-  background-color: #e60073;
-}
-
 /* Heart Animation */
 .heart {
   font-size: 6em;
   position: relative;
   color: #e63946;
-  width: 200px; /* Increased from 100px */
-  height: 200px; /* Increased from 100px */
+  width: 200px;
+  height: 200px;
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -97,4 +109,22 @@ a:hover {
     opacity: 0;
     transform: translate(-50%, -50%) scale(3);
   }
+}
+
+/* Enhance text readability */
+h1,
+p {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+/* Button hover effect */
+a:hover {
+  transition: all 0.3s ease;
+}
+
+.bg-pink-600:hover {
+  background-color: #e60073;
+  transform: translateY(-2px);
 }
