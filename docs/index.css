@@ -32,11 +32,25 @@ body {
   height: 100%;
   opacity: 0;
   transition: opacity 1s ease-in-out;
-  background-size: 100% auto;
   background-position: center;
   background-repeat: no-repeat;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+/* Improved background sizing for different screens */
+@media (min-width: 1024px) {
+  .background-slide {
+    background-size: contain;
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 1023px) {
+  .background-slide {
+    background-size: cover;
+  }
 }
 
 .background-slide::before {
@@ -70,33 +84,39 @@ body {
   }
 }
 
-/* Typography */
-h1 {
-  font-family: "Arial", sans-serif;
-  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 20, 147, 0.2);
-  letter-spacing: 1px;
-}
-
-p {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-  letter-spacing: 0.5px;
-  font-weight: 300;
-}
-
 /* Content Container */
 .content-container {
   position: relative;
   z-index: 1;
   transform-style: preserve-3d;
   perspective: 1000px;
+  max-width: 800px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Typography */
+h1 {
+  font-family: "Arial", sans-serif;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 20, 147, 0.2);
+  letter-spacing: 1px;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+}
+
+p {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.5px;
+  font-weight: 300;
+  font-size: clamp(1rem, 2vw, 1.25rem);
 }
 
 /* Heart Animation */
 .heart {
-  font-size: 6em;
+  font-size: clamp(4em, 8vw, 6em);
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: min(200px, 20vw);
+  height: min(200px, 20vw);
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -177,21 +197,38 @@ p {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .background-slide {
-    background-size: auto 100vh;
-  }
-
-  h1 {
-    font-size: 2.5rem !important;
-  }
-
-  .heart {
-    font-size: 5em;
+  .content-container {
+    width: 95%;
+    padding: 10px;
   }
 }
 
 @media (min-width: 1920px) {
+  .content-container {
+    max-width: 1000px;
+  }
+
   .background-slide {
-    background-size: cover;
+    background-size: contain;
+  }
+}
+
+/* For high-resolution displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .background-slide {
+    background-size: contain;
+  }
+}
+
+/* Additional responsive breakpoints */
+@media (max-height: 600px) {
+  .heart {
+    font-size: clamp(3em, 6vw, 4em);
+    width: min(150px, 15vw);
+    height: min(150px, 15vw);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
   }
 }
