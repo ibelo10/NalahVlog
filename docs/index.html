@@ -16,18 +16,21 @@
     />
     <link rel="stylesheet" href="src/css/base.css" />
   </head>
-  <body class="theme-dark font-sans leading-normal tracking-normal">
+  <body
+    class="theme-dark font-sans leading-normal tracking-normal min-h-screen overflow-x-hidden"
+  >
     <!-- Loading Overlay -->
     <div
       class="loading-overlay fixed inset-0 bg-black z-50 flex items-center justify-center"
     >
       <div class="heart">
-        <span class="heartbeat">❤️</span>
+        <span class="heartbeat">💋</span>
       </div>
     </div>
 
     <!-- Background Slideshow -->
-    <div class="background-container">
+    <div class="background-container fixed inset-0">
+      <div class="sensual-overlay"></div>
       <div
         class="background-slide active"
         style="background-image: url('Images/landingBG.jpg')"
@@ -46,50 +49,73 @@
     </div>
 
     <!-- Main Content -->
-    <main class="min-h-screen flex items-center justify-center relative z-10">
-      <section class="text-center py-16 content-container">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main
+      class="relative min-h-screen flex items-center justify-center z-10 px-4 py-16"
+    >
+      <div class="container mx-auto max-w-6xl">
+        <section class="text-center">
           <!-- Heart Animation -->
-          <div class="heart-container">
+          <div class="heart-container glow-effect mb-8">
             <div class="heart">
-              <span class="heartbeat">❤️</span>
-              <span class="heartecho">❤️</span>
+              <span class="heartbeat">💋</span>
+              <span class="heartecho">💋</span>
             </div>
           </div>
 
           <!-- Hero Content -->
-          <div class="mt-8 space-y-6 animate-fadeIn">
+          <div class="space-y-8 animate-fadeIn">
             <div class="title-wrapper">
-              <h1 class="animated-title text-5xl font-extrabold text-pink-600">
+              <h1 class="animated-title text-5xl sm:text-6xl font-extrabold">
                 Naughty Nalah's Playhouse
               </h1>
             </div>
-            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+
+            <p
+              class="text-lg sm:text-xl text-pink-200 mx-auto font-light leading-relaxed max-w-2xl"
+            >
               Discover exclusive content and unforgettable experiences with
-              Nalah.
+              <span class="font-medium text-pink-400">Nalah</span>
             </p>
+
+            <!-- Features -->
+            <div
+              class="flex justify-center gap-4 sm:gap-8 mt-6 text-pink-300/80"
+            >
+              <div class="feature-item">
+                <span class="text-xl sm:text-2xl">👄</span>
+                <p class="text-xs sm:text-sm mt-2">Exclusive Content</p>
+              </div>
+              <div class="feature-item">
+                <span class="text-xl sm:text-2xl">💖</span>
+                <p class="text-xs sm:text-sm mt-2">Private Shows</p>
+              </div>
+              <div class="feature-item">
+                <span class="text-xl sm:text-2xl">✨</span>
+                <p class="text-xs sm:text-sm mt-2">Special Requests</p>
+              </div>
+            </div>
 
             <!-- CTA Button -->
             <div class="mt-8">
               <a
                 href="home.html"
-                class="button-primary inline-block text-white px-6 py-3 rounded-full text-lg font-semibold hover:transform hover:scale-105 transition-all duration-300"
+                class="button-primary inline-block text-white px-6 py-3 rounded-full text-lg font-medium"
               >
-                Book Now
+                Enter Now
               </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <!-- Theme Toggle -->
     <button
       id="themeToggle"
-      class="fixed bottom-4 right-4 p-2 rounded-full bg-gray-800 text-white shadow-effect transition-effect"
+      class="fixed bottom-4 right-4 p-2 rounded-full bg-pink-900/30 text-pink-300 backdrop-blur-md shadow-glow transition-effect"
       aria-label="Toggle theme"
     >
-      🌓
+      🌙
     </button>
 
     <script type="module" src="src/js/main.js"></script>
