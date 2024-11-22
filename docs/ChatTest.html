@@ -1,0 +1,121 @@
+import React, { useState } from 'react';
+import { Camera, DollarSign, Send, Video, Mic, MicOff, VideoOff } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const VideoChatWithTipping = () => {
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [tipAmount, setTipAmount] = useState('');
+  const [showTipAlert, setShowTipAlert] = useState(false);
+
+  const handleTip = () => {
+    if (tipAmount && !isNaN(tipAmount) && parseFloat(tipAmount) > 0) {
+      setShowTipAlert(true);
+      setTimeout(() => setShowTipAlert(false), 3000);
+      setTipAmount('');
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      {/* Video Chat Section */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* Local Video */}
+        <Card className="relative">
+          <div className="bg-gray-800 h-64 rounded-lg flex items-center justify-center">
+            {isVideoOff ? (
+              <Camera className="w-16 h-16 text-gray-400" />
+            ) : (
+              <img 
+                src="/api/placeholder/400/320" 
+                alt="Local video" 
+                className="rounded-lg object-cover w-full h-full"
+              />
+            )}
+            <div className="absolute bottom-4 left-4 flex gap-2">
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className="p-2 rounded-full bg-gray-700 hover:bg-gray-600"
+              >
+                {isMuted ? <MicOff className="text-red-500" /> : <Mic className="text-white" />}
+              </button>
+              <button
+                onClick={() => setIsVideoOff(!isVideoOff)}
+                className="p-2 rounded-full bg-gray-700 hover:bg-gray-600"
+              >
+                {isVideoOff ? <VideoOff className="text-red-500" /> : <Video className="text-white" />}
+              </button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Remote Video */}
+        <Card className="relative">
+          <div className="bg-gray-800 h-64 rounded-lg flex items-center justify-center">
+            <img 
+              src="/api/placeholder/400/320" 
+              alt="Remote video" 
+              className="rounded-lg object-cover w-full h-full"
+            />
+          </div>
+        </Card>
+      </div>
+
+      {/* Tipping Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Send a Tip</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            {[5, 10, 20, 50].map((amount) => (
+              <button
+                key={amount}
+                onClick={() => setTipAmount(amount.toString())}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
+              >
+                <DollarSign className="w-4 h-4" />
+                {amount}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <div className="relative flex-1">
+              <DollarSign className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <input
+                type="number"
+                value={tipAmount}
+                onChange={(e) => setTipAmount(e.target.value)}
+                placeholder="Enter custom amount"
+                className="pl-10 w-full p-2 border rounded-lg"
+                min="1"
+              />
+            </div>
+            <button
+              onClick={handleTip}
+              className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2"
+            >
+              <Send className="w-4 h-4" />
+              Send Tip
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tip Alert */}
+      {showTipAlert && (
+        <div className="fixed bottom-4 right-4">
+          <Alert className="bg-green-100 border-green-500">
+            <AlertDescription className="text-green-800">
+              Tip of ${tipAmount} sent successfully!
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default VideoChatWithTipping;
