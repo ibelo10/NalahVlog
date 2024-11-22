@@ -15,16 +15,17 @@
             margin-bottom: 20px;
             position: relative;
         }
-        video { width: 100%; height: auto; }
+        .remote-video {
+            width: 100%;
+            max-height: 80vh;
+        }
         .controls {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            display: flex;
-            gap: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            margin: 10px 0;
         }
         button {
-            padding: 10px;
+            padding: 10px 20px;
             margin: 5px;
             cursor: pointer;
         }
@@ -33,6 +34,11 @@
             margin: 10px 0;
             background: #f0f0f0;
         }
+        .role-selector {
+            margin-bottom: 20px;
+        }
+        .error { color: red; }
+        .success { color: green; }
     </style>
 </head>
 <body>
@@ -40,55 +46,86 @@
     <script type="text/babel">
         const App = () => {
             const [isHost, setIsHost] = React.useState(false);
-            const [peerId, setPeerId] = React.useState('');
             const [status, setStatus] = React.useState('');
-            const [isMuted, setIsMuted] = React.useState(false);
-            const [isVideoOff, setIsVideoOff] = React.useState(false);
+            const [isConnected, setIsConnected] = React.useState(false);
+            const [useCamera, setUseCamera] = React.useState(false);
 
             const localVideoRef = React.useRef();
             const remoteVideoRef = React.useRef();
             const peerRef = React.useRef(null);
             const streamRef = React.useRef(null);
 
-            React.useEffect(() => {
-                // Initialize media stream
-                async function setupMedia() {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({
+            const setupHost = async () => {
+                try {
+                    // Host always needs camera
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    });
+                    streamRef.current = stream;
+                    if (localVideoRef.current) {
+                        localVideoRef.current.srcObject = stream;
+                    }
+
+                    const peer = new Peer('host-id');
+                    
+                    peer.on('open', (id) => {
+                        setStatus('Host ready for connections');
+                        peerRef.current = peer;
+                    });
+
+                    peer.on('connection', (conn) => {
+                        setStatus('Viewer connected!');
+                        setIsConnected(true);
+                    });
+
+                    peer.on('call', (call) => {
+                        call.answer(stream);
+                        setStatus('Video call started');
+                        
+                        call.on('stream', (remoteStream) => {
+                            setStatus('Received viewer stream');
+                        });
+                    });
+
+                } catch (err) {
+                    setStatus('Error: ' + err.message);
+                }
+            };
+
+            const setupViewer = async () => {
+                try {
+                    let stream = null;
+                    if (useCamera) {
+                        stream = await navigator.mediaDevices.getUserMedia({
                             video: true,
                             audio: true
                         });
-                        streamRef.current = stream;
                         if (localVideoRef.current) {
                             localVideoRef.current.srcObject = stream;
                         }
-
-                        // Initialize PeerJS
-                        const peer = new Peer(isHost ? 'host-id' : undefined);
-                        
-                        peer.on('open', (id) => {
-                            setPeerId(id);
-                            setStatus(isHost ? 'Host ready. ID: host-id' : `Your ID: ${id}`);
-                            peerRef.current = peer;
-                        });
-
-                        peer.on('call', (call) => {
-                            call.answer(stream);
-                            call.on('stream', (remoteStream) => {
-                                if (remoteVideoRef.current) {
-                                    remoteVideoRef.current.srcObject = remoteStream;
-                                }
-                            });
-                        });
-
-                    } catch (err) {
-                        setStatus('Error accessing camera/microphone: ' + err.message);
                     }
+                    
+                    const peer = new Peer();
+                    streamRef.current = stream;
+                    
+                    peer.on('open', (id) => {
+                        setStatus('Ready to connect to host');
+                        peerRef.current = peer;
+                    });
+
+                } catch (err) {
+                    setStatus('Error: ' + err.message);
+                }
+            };
+
+            React.useEffect(() => {
+                if (isHost) {
+                    setupHost();
+                } else {
+                    setupViewer();
                 }
 
-                setupMedia();
-
-                // Cleanup
                 return () => {
                     if (streamRef.current) {
                         streamRef.current.getTracks().forEach(track => track.stop());
@@ -97,82 +134,99 @@
                         peerRef.current.destroy();
                     }
                 };
-            }, [isHost]);
+            }, [isHost, useCamera]);
 
             const connectToHost = () => {
-                if (!peerRef.current || !streamRef.current) {
+                if (!peerRef.current) {
                     setStatus('Not ready to connect');
                     return;
                 }
 
-                const call = peerRef.current.call('host-id', streamRef.current);
-                call.on('stream', (remoteStream) => {
-                    if (remoteVideoRef.current) {
-                        remoteVideoRef.current.srcObject = remoteStream;
-                        setStatus('Connected to host');
+                // First establish data connection
+                const conn = peerRef.current.connect('host-id');
+                conn.on('open', () => {
+                    setStatus('Connected to host!');
+                    setIsConnected(true);
+
+                    // Then establish video call if camera is enabled
+                    if (useCamera && streamRef.current) {
+                        const call = peerRef.current.call('host-id', streamRef.current);
+                        call.on('stream', (remoteStream) => {
+                            if (remoteVideoRef.current) {
+                                remoteVideoRef.current.srcObject = remoteStream;
+                            }
+                        });
+                    } else {
+                        // Just receive the host's stream without sending one back
+                        const call = peerRef.current.call('host-id', new MediaStream());
+                        call.on('stream', (remoteStream) => {
+                            if (remoteVideoRef.current) {
+                                remoteVideoRef.current.srcObject = remoteStream;
+                            }
+                        });
                     }
                 });
             };
 
-            const toggleMute = () => {
+            const toggleRole = () => {
+                setIsHost(!isHost);
+                setIsConnected(false);
                 if (streamRef.current) {
-                    const audioTrack = streamRef.current.getAudioTracks()[0];
-                    audioTrack.enabled = !audioTrack.enabled;
-                    setIsMuted(!audioTrack.enabled);
+                    streamRef.current.getTracks().forEach(track => track.stop());
                 }
-            };
-
-            const toggleVideo = () => {
-                if (streamRef.current) {
-                    const videoTrack = streamRef.current.getVideoTracks()[0];
-                    videoTrack.enabled = !videoTrack.enabled;
-                    setIsVideoOff(!videoTrack.enabled);
+                if (peerRef.current) {
+                    peerRef.current.destroy();
                 }
             };
 
             return (
                 <div className="container">
-                    <div>
-                        <button onClick={() => setIsHost(true)} disabled={isHost}>
-                            Be Host
+                    <div className="role-selector">
+                        <button onClick={toggleRole} disabled={isConnected}>
+                            {isHost ? 'Switch to Viewer' : 'Switch to Host'}
                         </button>
-                        <button onClick={() => setIsHost(false)} disabled={!isHost}>
-                            Be Viewer
-                        </button>
+                        
+                        {!isHost && (
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={useCamera}
+                                    onChange={(e) => setUseCamera(e.target.checked)}
+                                    disabled={isConnected}
+                                /> Use Camera
+                            </label>
+                        )}
                     </div>
 
-                    <div className="status">{status}</div>
+                    <div className="status">Status: {status}</div>
 
-                    {!isHost && (
+                    {!isHost && !isConnected && (
                         <button onClick={connectToHost}>
                             Connect to Host
                         </button>
                     )}
 
-                    <div className="video-container">
-                        <video
-                            ref={localVideoRef}
-                            autoPlay
-                            playsInline
-                            muted
-                        />
-                        <div className="controls">
-                            <button onClick={toggleMute}>
-                                {isMuted ? 'Unmute' : 'Mute'}
-                            </button>
-                            <button onClick={toggleVideo}>
-                                {isVideoOff ? 'Start Video' : 'Stop Video'}
-                            </button>
+                    {isHost && (
+                        <div className="video-container">
+                            <video
+                                ref={localVideoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                            />
                         </div>
-                    </div>
+                    )}
 
-                    <div className="video-container">
-                        <video
-                            ref={remoteVideoRef}
-                            autoPlay
-                            playsInline
-                        />
-                    </div>
+                    {(!isHost || useCamera) && (
+                        <div className="remote-video">
+                            <video
+                                ref={remoteVideoRef}
+                                autoPlay
+                                playsInline
+                                className="remote-video"
+                            />
+                        </div>
+                    )}
                 </div>
             );
         };
