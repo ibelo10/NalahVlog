@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live Stream</title>
-    <!-- Load dependencies from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -41,21 +40,26 @@
         .video-grid {
             width: 100%;
             height: 100%;
-            display: grid;
-            gap: 4px;
-            padding: 4px;
+            position: relative;
         }
 
-        .video-grid.split {
-            grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
-        }
-
-        .video-element {
+        .host-video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 8px;
-            background: #000;
+        }
+
+        .guest-video {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40%;
+            max-width: 200px;
+            aspect-ratio: 9/16;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .overlay {
@@ -82,6 +86,7 @@
             justify-content: space-between;
             align-items: center;
             z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
         }
 
         .host-info {
@@ -105,6 +110,45 @@
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 14px;
+        }
+
+        .join-request {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .join-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .accept-btn {
+            background: #3DDC84;
+            color: black;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .decline-btn {
+            background: #FF4B4B;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .side-buttons {
@@ -131,15 +175,8 @@
             cursor: pointer;
         }
 
-        .bottom-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 100;
+        .request-join-btn {
+            background: #FE2C55;
         }
 
         .comments-section {
@@ -170,6 +207,18 @@
             animation: slideIn 0.3s ease;
         }
 
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+        }
+
         .comment-input {
             flex: 1;
             background: rgba(255,255,255,0.2);
@@ -184,44 +233,6 @@
             color: rgba(255,255,255,0.8);
         }
 
-        .host-controls {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 1000;
-        }
-
-        .room-input {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 20px;
-            padding: 10px 15px;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 10px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .room-input::placeholder {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .start-stream-btn {
-            background: #FE2C55;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
         .status-message {
             position: absolute;
             top: 70px;
@@ -234,6 +245,11 @@
             z-index: 1000;
         }
 
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         .gift-animation {
             position: absolute;
             bottom: 150px;
@@ -242,11 +258,6 @@
             animation: giftFloat 2s ease-out forwards;
             font-size: 24px;
             text-align: center;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
         }
 
         @keyframes giftFloat {
@@ -259,50 +270,43 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
+        const FIXED_ROOM_ID = 'your-fixed-room'; // Replace with your desired room ID
+        const HOST_NAME = 'Your Name'; // Replace with your name
+        const HOST_USERNAME = '@yourusername'; // Replace with your username
+
         const App = () => {
-            const [isHost, setIsHost] = React.useState(false);
+            const [isHost] = React.useState(false); // Set this to true in your hosted version
             const [isLive, setIsLive] = React.useState(false);
             const [status, setStatus] = React.useState('');
             const [comments, setComments] = React.useState([]);
             const [viewerCount, setViewerCount] = React.useState(0);
             const [gifts, setGifts] = React.useState([]);
-            const [participants, setParticipants] = React.useState([]);
-            const [roomId, setRoomId] = React.useState('');
+            const [hasGuest, setHasGuest] = React.useState(false);
+            const [joinRequests, setJoinRequests] = React.useState([]);
+            const [isRequestingToJoin, setIsRequestingToJoin] = React.useState(false);
             
             const localVideoRef = React.useRef();
+            const guestVideoRef = React.useRef();
             const peerRef = React.useRef(null);
             const streamRef = React.useRef(null);
             const commentsRef = React.useRef();
-            const participantRefs = React.useRef({});
-
-            React.useEffect(() => {
-                if (isHost) {
-                    setRoomId(Math.random().toString(36).substring(7));
-                }
-            }, [isHost]);
 
             const initializePeer = () => {
-                peerRef.current = new Peer();
+                peerRef.current = new Peer(FIXED_ROOM_ID);
                 
                 peerRef.current.on('open', (id) => {
-                    setStatus('Ready to connect. Room ID: ' + roomId);
+                    setStatus('Stream is live');
                 });
 
                 peerRef.current.on('call', (call) => {
+                    // For demo, auto-accept the call
                     call.answer(streamRef.current);
                     
                     call.on('stream', (remoteStream) => {
-                        const newParticipant = {
-                            id: call.peer,
-                            stream: remoteStream
-                        };
-                        setParticipants(prev => [...prev, newParticipant]);
-                        
-                        setTimeout(() => {
-                            if (participantRefs.current[call.peer]) {
-                                participantRefs.current[call.peer].srcObject = remoteStream;
-                            }
-                        }, 100);
+                        if (guestVideoRef.current) {
+                            guestVideoRef.current.srcObject = remoteStream;
+                            setHasGuest(true);
+                        }
                     });
                 });
             };
@@ -323,7 +327,7 @@
                 }
             };
 
-            const joinStream = async () => {
+            const requestToJoin = async () => {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: 'user' },
@@ -336,22 +340,18 @@
                     peerRef.current = new Peer();
                     
                     peerRef.current.on('open', (id) => {
-                        const call = peerRef.current.call(roomId, stream);
+                        const call = peerRef.current.call(FIXED_ROOM_ID, stream);
                         
                         call.on('stream', (remoteStream) => {
-                            const newParticipant = {
-                                id: call.peer,
-                                stream: remoteStream
-                            };
-                            setParticipants(prev => [...prev, newParticipant]);
-                            
-                            setTimeout(() => {
-                                if (participantRefs.current[call.peer]) {
-                                    participantRefs.current[call.peer].srcObject = remoteStream;
-                                }
-                            }, 100);
+                            if (localVideoRef.current) {
+                                localVideoRef.current.srcObject = remoteStream;
+                            }
                         });
                     });
+
+                    setIsRequestingToJoin(true);
+                    // In a real app, you'd send this request to the host
+                    setStatus('Join request sent to host');
                 } catch (err) {
                     setStatus('Error accessing camera: ' + err.message);
                 }
@@ -363,11 +363,11 @@
                 }, 3000);
 
                 const demoComments = [
-                    "Hello from Paris! 👋",
-                    "You're amazing! 🌟",
-                    "Keep going! 💫",
-                    "Love the stream 💖",
-                    "Greetings from Brazil! 🇧🇷"
+                    "Hello! 👋",
+                    "Great stream! 🌟",
+                    "Love the content! 💫",
+                    "Amazing! 💖",
+                    "Keep it up! 🔥"
                 ];
 
                 setInterval(() => {
@@ -401,23 +401,22 @@
             return (
                 <div className="app-container">
                     <div className="video-container">
-                        <div className={`video-grid ${participants.length > 0 ? 'split' : ''}`}>
+                        <div className="video-grid">
                             <video
                                 ref={localVideoRef}
                                 autoPlay
                                 playsInline
                                 muted
-                                className="video-element"
+                                className="host-video"
                             />
-                            {participants.map(participant => (
+                            {hasGuest && (
                                 <video
-                                    key={participant.id}
-                                    ref={el => participantRefs.current[participant.id] = el}
+                                    ref={guestVideoRef}
                                     autoPlay
                                     playsInline
-                                    className="video-element"
+                                    className="guest-video"
                                 />
-                            ))}
+                            )}
                         </div>
                     </div>
 
@@ -426,8 +425,8 @@
                             <div className="host-info">
                                 <div className="avatar">👤</div>
                                 <div>
-                                    <div>Host Name</div>
-                                    <div style={{ fontSize: '12px', opacity: 0.8 }}>@username</div>
+                                    <div>{HOST_NAME}</div>
+                                    <div style={{ fontSize: '12px', opacity: 0.8 }}>{HOST_USERNAME}</div>
                                 </div>
                             </div>
                             <div className="viewer-count">
@@ -437,6 +436,14 @@
 
                         {!isHost && (
                             <div className="side-buttons">
+                                {!isRequestingToJoin && (
+                                    <button 
+                                        className="side-button request-join-btn" 
+                                        onClick={requestToJoin}
+                                    >
+                                        🎥
+                                    </button>
+                                )}
                                 <button className="side-button" onClick={sendGift}>🎁</button>
                                 <button className="side-button">💝</button>
                                 <button className="side-button">⭐</button>
@@ -449,7 +456,8 @@
                                 <div key={index} className="comment">
                                     {comment}
                                 </div>
-                            ))}
+                            )
+                                    ))}
                         </div>
 
                         {gifts.map(gift => (
@@ -476,32 +484,40 @@
                         )}
                     </div>
 
-                    {!isLive && (
+                    {isHost && !isLive && (
                         <div className="host-controls">
-                            {isHost ? (
+                            <button 
+                                className="start-stream-btn"
+                                onClick={startStream}
+                            >
+                                Start Stream
+                            </button>
+                        </div>
+                    )}
+
+                    {joinRequests.length > 0 && isHost && (
+                        <div className="join-request">
+                            <div>
+                                <div style={{ fontWeight: 'bold' }}>@{joinRequests[0].username}</div>
+                                <div style={{ fontSize: '12px', opacity: 0.8 }}>wants to join</div>
+                            </div>
+                            <div className="join-actions">
                                 <button 
-                                    className="start-stream-btn"
-                                    onClick={startStream}
+                                    className="accept-btn"
+                                    onClick={() => {
+                                        setHasGuest(true);
+                                        setJoinRequests(prev => prev.slice(1));
+                                    }}
                                 >
-                                    Start Stream
+                                    Accept
                                 </button>
-                            ) : (
-                                <div>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter Room ID"
-                                        value={roomId}
-                                        onChange={(e) => setRoomId(e.target.value)}
-                                        className="room-input"
-                                    />
-                                    <button 
-                                        className="start-stream-btn"
-                                        onClick={joinStream}
-                                    >
-                                        Join Stream
-                                    </button>
-                                </div>
-                            )}
+                                <button 
+                                    className="decline-btn"
+                                    onClick={() => setJoinRequests(prev => prev.slice(1))}
+                                >
+                                    Decline
+                                </button>
+                            </div>
                         </div>
                     )}
 
@@ -510,19 +526,6 @@
                             {status}
                         </div>
                     )}
-
-                    <button
-                        style={{
-                            position: 'absolute',
-                            top: 10,
-                            right: 10,
-                            zIndex: 1001,
-                            opacity: 0.5
-                        }}
-                        onClick={() => setIsHost(!isHost)}
-                    >
-                        Switch to {isHost ? 'Viewer' : 'Host'}
-                    </button>
                 </div>
             );
         };
