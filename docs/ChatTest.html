@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live Stream</title>
+    <!-- Load dependencies from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -37,10 +38,24 @@
             background: #000;
         }
 
-        video {
+        .video-grid {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            gap: 4px;
+            padding: 4px;
+        }
+
+        .video-grid.split {
+            grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+        }
+
+        .video-element {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 8px;
+            background: #000;
         }
 
         .overlay {
@@ -57,7 +72,6 @@
             );
         }
 
-        /* Top Bar */
         .top-bar {
             position: absolute;
             top: 0;
@@ -93,7 +107,6 @@
             font-size: 14px;
         }
 
-        /* Side Buttons */
         .side-buttons {
             position: absolute;
             right: 10px;
@@ -118,7 +131,6 @@
             cursor: pointer;
         }
 
-        /* Bottom Bar */
         .bottom-bar {
             position: absolute;
             bottom: 0;
@@ -130,21 +142,6 @@
             z-index: 100;
         }
 
-        .comment-input {
-            flex: 1;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 20px;
-            padding: 10px 15px;
-            color: white;
-            font-size: 16px;
-        }
-
-        .comment-input::placeholder {
-            color: rgba(255,255,255,0.8);
-        }
-
-        /* Comments Section */
         .comments-section {
             position: absolute;
             bottom: 80px;
@@ -173,28 +170,20 @@
             animation: slideIn 0.3s ease;
         }
 
-        .gift-animation {
-            position: absolute;
-            bottom: 150px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: giftFloat 2s ease-out forwards;
-            font-size: 24px;
-            text-align: center;
+        .comment-input {
+            flex: 1;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 16px;
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .comment-input::placeholder {
+            color: rgba(255,255,255,0.8);
         }
 
-        @keyframes giftFloat {
-            0% { transform: translate(-50%, 0); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translate(-50%, -200px); opacity: 0; }
-        }
-
-        /* Host Controls */
         .host-controls {
             position: absolute;
             top: 50%;
@@ -205,6 +194,22 @@
             border-radius: 10px;
             text-align: center;
             z-index: 1000;
+        }
+
+        .room-input {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .room-input::placeholder {
+            color: rgba(255,255,255,0.8);
         }
 
         .start-stream-btn {
@@ -228,6 +233,27 @@
             font-size: 14px;
             z-index: 1000;
         }
+
+        .gift-animation {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: giftFloat 2s ease-out forwards;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes giftFloat {
+            0% { transform: translate(-50%, 0); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(-50%, -200px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -240,14 +266,46 @@
             const [comments, setComments] = React.useState([]);
             const [viewerCount, setViewerCount] = React.useState(0);
             const [gifts, setGifts] = React.useState([]);
-
+            const [participants, setParticipants] = React.useState([]);
+            const [roomId, setRoomId] = React.useState('');
+            
             const localVideoRef = React.useRef();
-            const remoteVideoRef = React.useRef();
             const peerRef = React.useRef(null);
             const streamRef = React.useRef(null);
             const commentsRef = React.useRef();
+            const participantRefs = React.useRef({});
 
-            // ... (previous peer connection logic) ...
+            React.useEffect(() => {
+                if (isHost) {
+                    setRoomId(Math.random().toString(36).substring(7));
+                }
+            }, [isHost]);
+
+            const initializePeer = () => {
+                peerRef.current = new Peer();
+                
+                peerRef.current.on('open', (id) => {
+                    setStatus('Ready to connect. Room ID: ' + roomId);
+                });
+
+                peerRef.current.on('call', (call) => {
+                    call.answer(streamRef.current);
+                    
+                    call.on('stream', (remoteStream) => {
+                        const newParticipant = {
+                            id: call.peer,
+                            stream: remoteStream
+                        };
+                        setParticipants(prev => [...prev, newParticipant]);
+                        
+                        setTimeout(() => {
+                            if (participantRefs.current[call.peer]) {
+                                participantRefs.current[call.peer].srcObject = remoteStream;
+                            }
+                        }, 100);
+                    });
+                });
+            };
 
             const startStream = async () => {
                 try {
@@ -258,13 +316,47 @@
                     streamRef.current = stream;
                     localVideoRef.current.srcObject = stream;
                     setIsLive(true);
-                    simulateViewers(); // For demo purposes
+                    initializePeer();
+                    simulateViewers();
                 } catch (err) {
                     setStatus('Error accessing camera: ' + err.message);
                 }
             };
 
-            // Simulate viewers and comments for demo
+            const joinStream = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' },
+                        audio: true
+                    });
+                    
+                    streamRef.current = stream;
+                    localVideoRef.current.srcObject = stream;
+                    
+                    peerRef.current = new Peer();
+                    
+                    peerRef.current.on('open', (id) => {
+                        const call = peerRef.current.call(roomId, stream);
+                        
+                        call.on('stream', (remoteStream) => {
+                            const newParticipant = {
+                                id: call.peer,
+                                stream: remoteStream
+                            };
+                            setParticipants(prev => [...prev, newParticipant]);
+                            
+                            setTimeout(() => {
+                                if (participantRefs.current[call.peer]) {
+                                    participantRefs.current[call.peer].srcObject = remoteStream;
+                                }
+                            }, 100);
+                        });
+                    });
+                } catch (err) {
+                    setStatus('Error accessing camera: ' + err.message);
+                }
+            };
+
             const simulateViewers = () => {
                 setInterval(() => {
                     setViewerCount(prev => Math.min(prev + Math.floor(Math.random() * 5), 999));
@@ -309,24 +401,27 @@
             return (
                 <div className="app-container">
                     <div className="video-container">
-                        {isHost ? (
+                        <div className={`video-grid ${participants.length > 0 ? 'split' : ''}`}>
                             <video
                                 ref={localVideoRef}
                                 autoPlay
                                 playsInline
                                 muted
+                                className="video-element"
                             />
-                        ) : (
-                            <video
-                                ref={remoteVideoRef}
-                                autoPlay
-                                playsInline
-                            />
-                        )}
+                            {participants.map(participant => (
+                                <video
+                                    key={participant.id}
+                                    ref={el => participantRefs.current[participant.id] = el}
+                                    autoPlay
+                                    playsInline
+                                    className="video-element"
+                                />
+                            ))}
+                        </div>
                     </div>
 
                     <div className="overlay">
-                        {/* Top Bar */}
                         <div className="top-bar">
                             <div className="host-info">
                                 <div className="avatar">👤</div>
@@ -340,7 +435,6 @@
                             </div>
                         </div>
 
-                        {/* Side Buttons */}
                         {!isHost && (
                             <div className="side-buttons">
                                 <button className="side-button" onClick={sendGift}>🎁</button>
@@ -350,7 +444,6 @@
                             </div>
                         )}
 
-                        {/* Comments */}
                         <div className="comments-section" ref={commentsRef}>
                             {comments.map((comment, index) => (
                                 <div key={index} className="comment">
@@ -359,7 +452,6 @@
                             ))}
                         </div>
 
-                        {/* Gift Animations */}
                         {gifts.map(gift => (
                             <div key={gift.id} className="gift-animation">
                                 {gift.emoji}
@@ -367,7 +459,6 @@
                             </div>
                         ))}
 
-                        {/* Bottom Bar */}
                         {!isHost && (
                             <div className="bottom-bar">
                                 <input
@@ -385,15 +476,32 @@
                         )}
                     </div>
 
-                    {/* Host Controls */}
-                    {isHost && !isLive && (
+                    {!isLive && (
                         <div className="host-controls">
-                            <button 
-                                className="start-stream-btn"
-                                onClick={startStream}
-                            >
-                                Start Stream
-                            </button>
+                            {isHost ? (
+                                <button 
+                                    className="start-stream-btn"
+                                    onClick={startStream}
+                                >
+                                    Start Stream
+                                </button>
+                            ) : (
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Room ID"
+                                        value={roomId}
+                                        onChange={(e) => setRoomId(e.target.value)}
+                                        className="room-input"
+                                    />
+                                    <button 
+                                        className="start-stream-btn"
+                                        onClick={joinStream}
+                                    >
+                                        Join Stream
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -403,7 +511,6 @@
                         </div>
                     )}
 
-                    {/* Role Switcher (for demo purposes) */}
                     <button
                         style={{
                             position: 'absolute',
