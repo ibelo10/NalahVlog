@@ -2,121 +2,231 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live Stream</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.1/peerjs.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #000; color: white; }
-        .container { width: 100%; height: 100vh; position: relative; }
-        
-        .video-container { 
-            width: 100%;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            background: #000; 
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overscroll-behavior: none;
+        }
+
+        .app-container {
+            position: fixed;
+            width: 100vw;
             height: 100vh;
-            position: relative;
+            overflow: hidden;
+        }
+
+        .video-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
             background: #000;
         }
-        
+
         video {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
         }
 
-        .fullscreen {
-            position: fixed;
+        .overlay {
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1000;
-            background: #000;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.4) 0%, 
+                transparent 20%, 
+                transparent 80%, 
+                rgba(0,0,0,0.4) 100%
+            );
         }
 
-        .self-view {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 150px;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            z-index: 1001;
-            display: none;
-        }
-
-        .show-self {
-            display: block;
-        }
-
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+        /* Top Bar */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
             display: flex;
-            gap: 10px;
-            z-index: 1002;
-            padding: 10px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 20px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
         }
 
-        .control-btn {
-            width: 50px;
-            height: 50px;
+        .host-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: none;
             background: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .control-btn.active {
-            background: #4CAF50;
-        }
-
-        .status {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
+        .viewer-count {
             background: rgba(0,0,0,0.5);
-            color: white;
+            padding: 5px 10px;
             border-radius: 20px;
-            z-index: 1002;
+            font-size: 14px;
         }
 
-        .setup-controls {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1002;
+        /* Side Buttons */
+        .side-buttons {
+            position: absolute;
+            right: 10px;
+            bottom: 100px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            z-index: 100;
         }
 
-        .setup-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
+        .side-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
             background: rgba(255,255,255,0.2);
+            border: none;
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             cursor: pointer;
         }
 
-        .setup-btn:hover {
-            background: rgba(255,255,255,0.3);
+        /* Bottom Bar */
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .comment-input {
+            flex: 1;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .comment-input::placeholder {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            position: absolute;
+            bottom: 80px;
+            left: 10px;
+            right: 70px;
+            height: 40%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .comments-section::-webkit-scrollbar {
+            display: none;
+        }
+
+        .comment {
+            background: rgba(0,0,0,0.5);
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            max-width: 85%;
+            animation: slideIn 0.3s ease;
+        }
+
+        .gift-animation {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: giftFloat 2s ease-out forwards;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes giftFloat {
+            0% { transform: translate(-50%, 0); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(-50%, -200px); opacity: 0; }
+        }
+
+        /* Host Controls */
+        .host-controls {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .start-stream-btn {
+            background: #FE2C55;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .status-message {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -125,68 +235,80 @@
     <script type="text/babel">
         const App = () => {
             const [isHost, setIsHost] = React.useState(false);
+            const [isLive, setIsLive] = React.useState(false);
             const [status, setStatus] = React.useState('');
-            const [isConnected, setIsConnected] = React.useState(false);
-            const [useCamera, setUseCamera] = React.useState(false);
-            const [showSelfView, setShowSelfView] = React.useState(true);
-            const [isFullscreen, setIsFullscreen] = React.useState(false);
+            const [comments, setComments] = React.useState([]);
+            const [viewerCount, setViewerCount] = React.useState(0);
+            const [gifts, setGifts] = React.useState([]);
 
             const localVideoRef = React.useRef();
             const remoteVideoRef = React.useRef();
             const peerRef = React.useRef(null);
             const streamRef = React.useRef(null);
+            const commentsRef = React.useRef();
 
-            // Previous connection logic remains the same...
-            // (Include all the setupHost, setupViewer, and connection logic from the previous version)
+            // ... (previous peer connection logic) ...
 
-            const toggleFullscreen = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                    setIsFullscreen(true);
-                } else {
-                    document.exitFullscreen();
-                    setIsFullscreen(false);
+            const startStream = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' },
+                        audio: true
+                    });
+                    streamRef.current = stream;
+                    localVideoRef.current.srcObject = stream;
+                    setIsLive(true);
+                    simulateViewers(); // For demo purposes
+                } catch (err) {
+                    setStatus('Error accessing camera: ' + err.message);
                 }
             };
 
-            const toggleSelfView = () => {
-                setShowSelfView(!showSelfView);
+            // Simulate viewers and comments for demo
+            const simulateViewers = () => {
+                setInterval(() => {
+                    setViewerCount(prev => Math.min(prev + Math.floor(Math.random() * 5), 999));
+                }, 3000);
+
+                const demoComments = [
+                    "Hello from Paris! 👋",
+                    "You're amazing! 🌟",
+                    "Keep going! 💫",
+                    "Love the stream 💖",
+                    "Greetings from Brazil! 🇧🇷"
+                ];
+
+                setInterval(() => {
+                    if (Math.random() > 0.5) {
+                        addComment(demoComments[Math.floor(Math.random() * demoComments.length)]);
+                    }
+                }, 2000);
+            };
+
+            const addComment = (text) => {
+                setComments(prev => [...prev, text].slice(-20));
+                setTimeout(() => {
+                    if (commentsRef.current) {
+                        commentsRef.current.scrollTop = commentsRef.current.scrollHeight;
+                    }
+                }, 100);
+            };
+
+            const sendGift = () => {
+                const giftEmojis = ['🎁', '🌟', '🎈', '💝', '👑'];
+                const newGift = {
+                    id: Date.now(),
+                    emoji: giftEmojis[Math.floor(Math.random() * giftEmojis.length)]
+                };
+                setGifts(prev => [...prev, newGift]);
+                setTimeout(() => {
+                    setGifts(prev => prev.filter(g => g.id !== newGift.id));
+                }, 2000);
             };
 
             return (
-                <div className="container">
-                    <div className="status">{status}</div>
-
-                    <div className="setup-controls">
-                        <button 
-                            className="setup-btn"
-                            onClick={() => setIsHost(!isHost)}
-                        >
-                            {isHost ? 'Switch to Viewer' : 'Switch to Host'}
-                        </button>
-                        
-                        {!isHost && (
-                            <>
-                                <button 
-                                    className="setup-btn"
-                                    onClick={() => setUseCamera(!useCamera)}
-                                >
-                                    {useCamera ? 'Disable Camera' : 'Enable Camera'}
-                                </button>
-                                {!isConnected && (
-                                    <button 
-                                        className="setup-btn"
-                                        onClick={connectToHost}
-                                    >
-                                        Connect to Host
-                                    </button>
-                                )}
-                            </>
-                        )}
-                    </div>
-
-                    {/* Main Video Display */}
-                    <div className={`video-container ${isFullscreen ? 'fullscreen' : ''}`}>
+                <div className="app-container">
+                    <div className="video-container">
                         {isHost ? (
                             <video
                                 ref={localVideoRef}
@@ -203,46 +325,100 @@
                         )}
                     </div>
 
-                    {/* Self View (Picture in Picture) */}
-                    {useCamera && !isHost && (
-                        <div className={`self-view ${showSelfView ? 'show-self' : ''}`}>
-                            <video
-                                ref={localVideoRef}
-                                autoPlay
-                                playsInline
-                                muted
-                            />
+                    <div className="overlay">
+                        {/* Top Bar */}
+                        <div className="top-bar">
+                            <div className="host-info">
+                                <div className="avatar">👤</div>
+                                <div>
+                                    <div>Host Name</div>
+                                    <div style={{ fontSize: '12px', opacity: 0.8 }}>@username</div>
+                                </div>
+                            </div>
+                            <div className="viewer-count">
+                                👥 {viewerCount}
+                            </div>
+                        </div>
+
+                        {/* Side Buttons */}
+                        {!isHost && (
+                            <div className="side-buttons">
+                                <button className="side-button" onClick={sendGift}>🎁</button>
+                                <button className="side-button">💝</button>
+                                <button className="side-button">⭐</button>
+                                <button className="side-button">❤️</button>
+                            </div>
+                        )}
+
+                        {/* Comments */}
+                        <div className="comments-section" ref={commentsRef}>
+                            {comments.map((comment, index) => (
+                                <div key={index} className="comment">
+                                    {comment}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Gift Animations */}
+                        {gifts.map(gift => (
+                            <div key={gift.id} className="gift-animation">
+                                {gift.emoji}
+                                <div style={{ fontSize: '14px' }}>Sent a gift!</div>
+                            </div>
+                        ))}
+
+                        {/* Bottom Bar */}
+                        {!isHost && (
+                            <div className="bottom-bar">
+                                <input
+                                    type="text"
+                                    className="comment-input"
+                                    placeholder="Add comment..."
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter' && e.target.value.trim()) {
+                                            addComment(e.target.value);
+                                            e.target.value = '';
+                                        }
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Host Controls */}
+                    {isHost && !isLive && (
+                        <div className="host-controls">
+                            <button 
+                                className="start-stream-btn"
+                                onClick={startStream}
+                            >
+                                Start Stream
+                            </button>
                         </div>
                     )}
 
-                    {/* Control Bar */}
-                    <div className="controls">
-                        <button 
-                            className="control-btn"
-                            onClick={toggleFullscreen}
-                        >
-                            {isFullscreen ? '⤓' : '⤢'}
-                        </button>
-                        
-                        {useCamera && !isHost && (
-                            <button 
-                                className={`control-btn ${showSelfView ? 'active' : ''}`}
-                                onClick={toggleSelfView}
-                            >
-                                👤
-                            </button>
-                        )}
-                    </div>
+                    {status && (
+                        <div className="status-message">
+                            {status}
+                        </div>
+                    )}
+
+                    {/* Role Switcher (for demo purposes) */}
+                    <button
+                        style={{
+                            position: 'absolute',
+                            top: 10,
+                            right: 10,
+                            zIndex: 1001,
+                            opacity: 0.5
+                        }}
+                        onClick={() => setIsHost(!isHost)}
+                    >
+                        Switch to {isHost ? 'Viewer' : 'Host'}
+                    </button>
                 </div>
             );
         };
-
-        // Handle fullscreen changes
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                setIsFullscreen(false);
-            }
-        });
 
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
