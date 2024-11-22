@@ -3,534 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Live Stream</title>
+    <title>Live Stream - Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.1/peerjs.min.js"></script>
     <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
             padding: 0;
-            -webkit-tap-highlight-color: transparent;
         }
-
-        body { 
-            background: #000; 
+        body {
+            background: #000;
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overscroll-behavior: none;
         }
-
         .app-container {
-            position: fixed;
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-        }
-
-        .video-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: #000;
-        }
-
-        .video-grid {
-            width: 100%;
-            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             position: relative;
         }
-
+        .video-container {
+            width: 100%;
+            height: 80%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .host-video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        .guest-video {
+        .viewer-info {
             position: absolute;
             top: 10px;
-            right: 10px;
-            width: 40%;
-            max-width: 200px;
-            aspect-ratio: 9/16;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, 
-                rgba(0,0,0,0.4) 0%, 
-                transparent 20%, 
-                transparent 80%, 
-                rgba(0,0,0,0.4) 100%
-            );
-        }
-
-        .top-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
-        }
-
-        .host-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .viewer-count {
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 20px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 10px;
             font-size: 14px;
         }
-
-        .join-request {
-            position: absolute;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            padding: 12px 20px;
-            border-radius: 12px;
+        .comments-section {
+            width: 90%;
+            height: 20%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .join-actions {
-            display: flex;
+            flex-direction: column;
             gap: 8px;
         }
-
-        .accept-btn {
-            background: #3DDC84;
-            color: black;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .decline-btn {
-            background: #FF4B4B;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .side-buttons {
-            position: absolute;
-            right: 10px;
-            bottom: 100px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 100;
-        }
-
-        .side-button {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .request-join-btn {
-            background: #FE2C55;
-        }
-
-        .comments-section {
-            position: absolute;
-            bottom: 80px;
-            left: 10px;
-            right: 70px;
-            height: 40%;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 10px;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .comments-section::-webkit-scrollbar {
-            display: none;
-        }
-
         .comment {
-            background: rgba(0,0,0,0.5);
+            background: rgba(255, 255, 255, 0.1);
             padding: 8px 12px;
-            border-radius: 15px;
+            border-radius: 8px;
             font-size: 14px;
-            max-width: 85%;
-            animation: slideIn 0.3s ease;
-        }
-
-        .bottom-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 100;
-            background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
-        }
-
-        .comment-input {
-            flex: 1;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 20px;
-            padding: 10px 15px;
-            color: white;
-            font-size: 16px;
-        }
-
-        .comment-input::placeholder {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .status-message {
-            position: absolute;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            z-index: 1000;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .gift-animation {
-            position: absolute;
-            bottom: 150px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: giftFloat 2s ease-out forwards;
-            font-size: 24px;
-            text-align: center;
-        }
-
-        @keyframes giftFloat {
-            0% { transform: translate(-50%, 0); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translate(-50%, -200px); opacity: 0; }
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        const FIXED_ROOM_ID = 'NalahLand'; // Replace with your desired room ID
-        const HOST_NAME = 'Nalah'; // Replace with your name
-        const HOST_USERNAME = '@NaughtyNalah'; // Replace with your username
-
-        const App = () => {
-            const [isHost] = React.useState(false); // Set this to true in your hosted version
-            const [isLive, setIsLive] = React.useState(false);
-            const [status, setStatus] = React.useState('');
+        const VisitorApp = () => {
             const [comments, setComments] = React.useState([]);
             const [viewerCount, setViewerCount] = React.useState(0);
-            const [gifts, setGifts] = React.useState([]);
-            const [hasGuest, setHasGuest] = React.useState(false);
-            const [joinRequests, setJoinRequests] = React.useState([]);
-            const [isRequestingToJoin, setIsRequestingToJoin] = React.useState(false);
-            
-            const localVideoRef = React.useRef();
-            const guestVideoRef = React.useRef();
-            const peerRef = React.useRef(null);
-            const streamRef = React.useRef(null);
-            const commentsRef = React.useRef();
+            const videoRef = React.useRef();
 
-            const initializePeer = () => {
-                peerRef.current = new Peer(FIXED_ROOM_ID);
-                
-                peerRef.current.on('open', (id) => {
-                    setStatus('Stream is live');
-                });
-
-                peerRef.current.on('call', (call) => {
-                    // For demo, auto-accept the call
-                    call.answer(streamRef.current);
-                    
-                    call.on('stream', (remoteStream) => {
-                        if (guestVideoRef.current) {
-                            guestVideoRef.current.srcObject = remoteStream;
-                            setHasGuest(true);
-                        }
-                    });
-                });
-            };
-
-            const startStream = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'user' },
-                        audio: true
-                    });
-                    streamRef.current = stream;
-                    localVideoRef.current.srcObject = stream;
-                    setIsLive(true);
-                    initializePeer();
-                    simulateViewers();
-                } catch (err) {
-                    setStatus('Error accessing camera: ' + err.message);
-                }
-            };
-
-            const requestToJoin = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'user' },
-                        audio: true
-                    });
-                    
-                    streamRef.current = stream;
-                    localVideoRef.current.srcObject = stream;
-                    
-                    peerRef.current = new Peer();
-                    
-                    peerRef.current.on('open', (id) => {
-                        const call = peerRef.current.call(FIXED_ROOM_ID, stream);
-                        
-                        call.on('stream', (remoteStream) => {
-                            if (localVideoRef.current) {
-                                localVideoRef.current.srcObject = remoteStream;
-                            }
-                        });
-                    });
-
-                    setIsRequestingToJoin(true);
-                    // In a real app, you'd send this request to the host
-                    setStatus('Join request sent to host');
-                } catch (err) {
-                    setStatus('Error accessing camera: ' + err.message);
-                }
-            };
-
-            const simulateViewers = () => {
-                setInterval(() => {
-                    setViewerCount(prev => Math.min(prev + Math.floor(Math.random() * 5), 999));
+            React.useEffect(() => {
+                // Simulate live viewer count updates
+                const viewerInterval = setInterval(() => {
+                    setViewerCount((prev) => Math.min(prev + Math.floor(Math.random() * 5), 999));
                 }, 3000);
 
-                const demoComments = [
-                    "Hello! 👋",
-                    "Great stream! 🌟",
-                    "Love the content! 💫",
-                    "Amazing! 💖",
-                    "Keep it up! 🔥"
-                ];
-
-                setInterval(() => {
-                    if (Math.random() > 0.5) {
-                        addComment(demoComments[Math.floor(Math.random() * demoComments.length)]);
-                    }
+                // Simulate incoming comments
+                const commentInterval = setInterval(() => {
+                    const demoComments = [
+                        "Hello! 👋",
+                        "Great stream! 🌟",
+                        "Loving the content! 💫",
+                        "Amazing work! 💖",
+                        "Keep it up! 🔥"
+                    ];
+                    const randomComment = demoComments[Math.floor(Math.random() * demoComments.length)];
+                    setComments((prev) => [...prev, randomComment].slice(-20));
                 }, 2000);
-            };
 
-            const addComment = (text) => {
-                setComments(prev => [...prev, text].slice(-20));
-                setTimeout(() => {
-                    if (commentsRef.current) {
-                        commentsRef.current.scrollTop = commentsRef.current.scrollHeight;
-                    }
-                }, 100);
-            };
-
-            const sendGift = () => {
-                const giftEmojis = ['🎁', '🌟', '🎈', '💝', '👑'];
-                const newGift = {
-                    id: Date.now(),
-                    emoji: giftEmojis[Math.floor(Math.random() * giftEmojis.length)]
+                // Cleanup intervals on unmount
+                return () => {
+                    clearInterval(viewerInterval);
+                    clearInterval(commentInterval);
                 };
-                setGifts(prev => [...prev, newGift]);
-                setTimeout(() => {
-                    setGifts(prev => prev.filter(g => g.id !== newGift.id));
-                }, 2000);
-            };
+            }, []);
 
             return (
                 <div className="app-container">
+                    <div className="viewer-info">👥 Viewers: {viewerCount}</div>
                     <div className="video-container">
-                        <div className="video-grid">
-                            <video
-                                ref={localVideoRef}
-                                autoPlay
-                                playsInline
-                                muted
-                                className="host-video"
-                            />
-                            {hasGuest && (
-                                <video
-                                    ref={guestVideoRef}
-                                    autoPlay
-                                    playsInline
-                                    className="guest-video"
-                                />
-                            )}
-                        </div>
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            className="host-video"
+                            src="https://www.w3schools.com/html/mov_bbb.mp4" <!-- Placeholder -->
+                        ></video>
                     </div>
-
-                    <div className="overlay">
-                        <div className="top-bar">
-                            <div className="host-info">
-                                <div className="avatar">👤</div>
-                                <div>
-                                    <div>{HOST_NAME}</div>
-                                    <div style={{ fontSize: '12px', opacity: 0.8 }}>{HOST_USERNAME}</div>
-                                </div>
-                            </div>
-                            <div className="viewer-count">
-                                👥 {viewerCount}
-                            </div>
-                        </div>
-
-                        {!isHost && (
-                            <div className="side-buttons">
-                                {!isRequestingToJoin && (
-                                    <button 
-                                        className="side-button request-join-btn" 
-                                        onClick={requestToJoin}
-                                    >
-                                        🎥
-                                    </button>
-                                )}
-                                <button className="side-button" onClick={sendGift}>🎁</button>
-                                <button className="side-button">💝</button>
-                                <button className="side-button">⭐</button>
-                                <button className="side-button">❤️</button>
-                            </div>
-                        )}
-
-                        <div className="comments-section" ref={commentsRef}>
-                            {comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    {comment}
-                                </div>
-                            )
-                                    ))}
-                        </div>
-
-                        {gifts.map(gift => (
-                            <div key={gift.id} className="gift-animation">
-                                {gift.emoji}
-                                <div style={{ fontSize: '14px' }}>Sent a gift!</div>
+                    <div className="comments-section">
+                        {comments.map((comment, index) => (
+                            <div key={index} className="comment">
+                                {comment}
                             </div>
                         ))}
-
-                        {!isHost && (
-                            <div className="bottom-bar">
-                                <input
-                                    type="text"
-                                    className="comment-input"
-                                    placeholder="Add comment..."
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter' && e.target.value.trim()) {
-                                            addComment(e.target.value);
-                                            e.target.value = '';
-                                        }
-                                    }}
-                                />
-                            </div>
-                        )}
                     </div>
-
-                    {isHost && !isLive && (
-                        <div className="host-controls">
-                            <button 
-                                className="start-stream-btn"
-                                onClick={startStream}
-                            >
-                                Start Stream
-                            </button>
-                        </div>
-                    )}
-
-                    {joinRequests.length > 0 && isHost && (
-                        <div className="join-request">
-                            <div>
-                                <div style={{ fontWeight: 'bold' }}>@{joinRequests[0].username}</div>
-                                <div style={{ fontSize: '12px', opacity: 0.8 }}>wants to join</div>
-                            </div>
-                            <div className="join-actions">
-                                <button 
-                                    className="accept-btn"
-                                    onClick={() => {
-                                        setHasGuest(true);
-                                        setJoinRequests(prev => prev.slice(1));
-                                    }}
-                                >
-                                    Accept
-                                </button>
-                                <button 
-                                    className="decline-btn"
-                                    onClick={() => setJoinRequests(prev => prev.slice(1))}
-                                >
-                                    Decline
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {status && (
-                        <div className="status-message">
-                            {status}
-                        </div>
-                    )}
                 </div>
             );
         };
 
-        ReactDOM.render(<App />, document.getElementById('root'));
+        // Initialize the app
+        const startApp = () => {
+            const root = ReactDOM.createRoot(document.getElementById("root"));
+            root.render(<VisitorApp />);
+        };
+
+        // Start the app on page load
+        startApp();
     </script>
 </body>
 </html>
