@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live Stream</title>
-    <!-- Load dependencies from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -191,6 +190,73 @@
             background: #e61e48;
         }
 
+        .setup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .setup-container {
+            background: #1a1a1a;
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .setup-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .setup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #ddd;
+        }
+
+        .setup-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .setup-input:focus {
+            outline: none;
+            border-color: #FE2C55;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .setup-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
         .join-request {
             position: absolute;
             top: 70px;
@@ -241,7 +307,13 @@
             border-radius: 20px;
             font-size: 14px;
             z-index: 1000;
-            pointer-events: none;
+        }
+
+        .error-message {
+            color: #FF4B4B;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
         }
 
         @keyframes slideIn {
@@ -258,12 +330,67 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        // Configuration constants - UPDATE THESE
-        const FIXED_ROOM_ID = 'your-channel-id'; // Choose a unique identifier
-        const HOST_NAME = 'Your Name';           // Your display name
-        const HOST_USERNAME = '@yourusername';   // Your username
+        // SetupModal Component
+        const SetupModal = ({ onComplete }) => {
+            const [displayName, setDisplayName] = React.useState('');
+            const [username, setUsername] = React.useState('');
+            const [error, setError] = React.useState('');
 
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                
+                if (!displayName.trim() || !username.trim()) {
+                    setError('Please fill in all fields');
+                    return;
+                }
+
+                // Ensure username starts with @
+                const formattedUsername = username.startsWith('@') ? 
+                    username : '@' + username;
+
+                onComplete(displayName, formattedUsername);
+            };
+
+            return (
+                <div className="setup-modal">
+                    <div className="setup-container">
+                        <div className="setup-title">Setup Your Stream</div>
+                        <form className="setup-form" onSubmit={handleSubmit}>
+                            <div className="input-group">
+                                <label>Display Name</label>
+                                <input
+                                    type="text"
+                                    className="setup-input"
+                                    placeholder="Enter your display name"
+                                    value={displayName}
+                                    onChange={(e) => setDisplayName(e.target.value)}
+                                />
+                            </div>
+                            <div className="input-group">
+                                <label>Username</label>
+                                <input
+                                    type="text"
+                                    className="setup-input"
+                                    placeholder="@username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </div>
+                            <button type="submit" className="start-btn">
+                                Continue to Stream
+                            </button>
+                            {error && <div className="error-message">{error}</div>}
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
         const App = () => {
+            const [isSetupComplete, setIsSetupComplete] = React.useState(false);
+            const [displayName, setDisplayName] = React.useState('');
+            const [username, setUsername] = React.useState('');
             const [isLive, setIsLive] = React.useState(false);
             const [status, setStatus] = React.useState('');
             const [comments, setComments] = React.useState([]);
@@ -279,8 +406,29 @@
             const streamRef = React.useRef(null);
             const commentsRef = React.useRef();
 
+            const handleSetupComplete = (name, user) => {
+                setDisplayName(name);
+                setUsername(user);
+                setIsSetupComplete(true);
+                // Save to localStorage for persistence
+                localStorage.setItem('streamDisplayName', name);
+                localStorage.setItem('streamUsername', user);
+            };
+
+            React.useEffect(() => {
+                // Check for saved credentials
+                const savedName = localStorage.getItem('streamDisplayName');
+                const savedUsername = localStorage.getItem('streamUsername');
+                if (savedName && savedUsername) {
+                    setDisplayName(savedName);
+                    setUsername(savedUsername);
+                    setIsSetupComplete(true);
+                }
+            }, []);
+
             const initializePeer = () => {
-                peerRef.current = new Peer(FIXED_ROOM_ID);
+                const peerId = 'host-' + Math.random().toString(36).substr(2, 9);
+                peerRef.current = new Peer(peerId);
                 
                 peerRef.current.on('open', (id) => {
                     setStatus('Stream is live');
@@ -295,7 +443,7 @@
                             call,
                             timeout: setTimeout(() => {
                                 setJoinRequests(prev => prev.filter(req => req.id !== call.peer));
-                            }, 30000) // Request expires after 30 seconds
+                            }, 30000)
                         };
                     }
                 });
@@ -315,6 +463,7 @@
                     localVideoRef.current.srcObject = stream;
                     setIsLive(true);
                     initializePeer();
+                    simulateViewers();
                 } catch (err) {
                     setStatus('Error accessing camera: ' + err.message);
                 }
@@ -327,8 +476,7 @@
                         track.enabled = !track.enabled;
                     });
                     setIsMuted(!isMuted);
-                }
-            };
+                };
 
             const toggleCamera = () => {
                 if (streamRef.current) {
@@ -351,6 +499,35 @@
                 setHasGuest(false);
                 setJoinRequests([]);
                 setStatus('');
+            };
+
+            const simulateViewers = () => {
+                setInterval(() => {
+                    setViewerCount(prev => Math.min(prev + Math.floor(Math.random() * 5), 999));
+                }, 3000);
+
+                const demoComments = [
+                    "Hello! 👋",
+                    "Great stream! 🌟",
+                    "Love the content! 💫",
+                    "Amazing! 💖",
+                    "Keep it up! 🔥"
+                ];
+
+                setInterval(() => {
+                    if (Math.random() > 0.5) {
+                        addComment(demoComments[Math.floor(Math.random() * demoComments.length)]);
+                    }
+                }, 2000);
+            };
+
+            const addComment = (text) => {
+                setComments(prev => [...prev, text].slice(-20));
+                setTimeout(() => {
+                    if (commentsRef.current) {
+                        commentsRef.current.scrollTop = commentsRef.current.scrollHeight;
+                    }
+                }, 100);
             };
 
             const acceptJoinRequest = (requestId) => {
@@ -383,116 +560,120 @@
 
             return (
                 <div className="app-container">
-                    <div className="video-container">
-                        <div className="video-grid">
-                            <video
-                                ref={localVideoRef}
-                                autoPlay
-                                playsInline
-                                muted
-                                className="host-video"
-                            />
-                            {hasGuest && (
-                                <video
-                                    ref={guestVideoRef}
-                                    autoPlay
-                                    playsInline
-                                    className="guest-video"
-                                />
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="overlay">
-                        <div className="top-bar">
-                            <div className="host-info">
-                                <div className="avatar">👤</div>
-                                <div>
-                                    <div>{HOST_NAME}</div>
-                                    <div style={{ fontSize: '12px', opacity: 0.8 }}>{HOST_USERNAME}</div>
+                    {!isSetupComplete ? (
+                        <SetupModal onComplete={handleSetupComplete} />
+                    ) : (
+                        <>
+                            <div className="video-container">
+                                <div className="video-grid">
+                                    <video
+                                        ref={localVideoRef}
+                                        autoPlay
+                                        playsInline
+                                        muted
+                                        className="host-video"
+                                    />
+                                    {hasGuest && (
+                                        <video
+                                            ref={guestVideoRef}
+                                            autoPlay
+                                            playsInline
+                                            className="guest-video"
+                                        />
+                                    )}
                                 </div>
                             </div>
-                            {isLive && (
-                                <div className="viewer-count">
-                                    👥 {viewerCount}
-                                </div>
-                            )}
-                        </div>
 
-                        <div className="comments-section" ref={commentsRef}>
-                            {comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    {comment}
+                            <div className="overlay">
+                                <div className="top-bar">
+                                    <div className="host-info">
+                                        <div className="avatar">👤</div>
+                                        <div>
+                                            <div>{displayName}</div>
+                                            <div style={{ fontSize: '12px', opacity: 0.8 }}>{username}</div>
+                                        </div>
+                                    </div>
+                                    {isLive && (
+                                        <div className="viewer-count">
+                                            👥 {viewerCount}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="comments-section" ref={commentsRef}>
+                                    {comments.map((comment, index) => (
+                                        <div key={index} className="comment">
+                                            {comment}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {isLive ? (
+                                    <div className="host-controls">
+                                        <button 
+                                            className={`control-button ${isMuted ? 'active' : ''}`}
+                                            onClick={toggleMute}
+                                        >
+                                            {isMuted ? '🔇' : '🎤'}
+                                        </button>
+                                        <button 
+                                            className={`control-button ${isCameraOff ? 'active' : ''}`}
+                                            onClick={toggleCamera}
+                                        >
+                                            {isCameraOff ? '🚫' : '📹'}
+                                        </button>
+                                        <button 
+                                            className="control-button active"
+                                            onClick={endStream}
+                                        >
+                                            ⏹️
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="host-controls">
+                                        <button 
+                                            className="start-stream-btn"
+                                            onClick={startStream}
+                                        >
+                                            Start Stream
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {joinRequests.map((request) => (
+                                <div key={request.id} className="join-request">
+                                    <div>
+                                        <div style={{ fontWeight: 'bold' }}>@{request.username}</div>
+                                        <div style={{ fontSize: '12px', opacity: 0.8 }}>wants to join</div>
+                                    </div>
+                                    <div className="join-actions">
+                                        <button 
+                                            className="accept-btn"
+                                            onClick={() => acceptJoinRequest(request.id)}
+                                        >
+                                            Accept
+                                        </button>
+                                        <button 
+                                            className="decline-btn"
+                                            onClick={() => {
+                                                setJoinRequests(prev => 
+                                                    prev.filter(req => req.id !== request.id)
+                                                );
+                                            }}
+                                        >
+                                            Decline
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
-                        </div>
 
-                        {isLive ? (
-                            <div className="host-controls">
-                                <button 
-                                    className={`control-button ${isMuted ? 'active' : ''}`}
-                                    onClick={toggleMute}
-                                >
-                                    {isMuted ? '🔇' : '🎤'}
-                                </button>
-                                <button 
-                                    className={`control-button ${isCameraOff ? 'active' : ''}`}
-                                    onClick={toggleCamera}
-                                >
-                                    {isCameraOff ? '🚫' : '📹'}
-                                </button>
-                                <button 
-                                    className="control-button active"
-                                    onClick={endStream}
-                                >
-                                    ⏹️
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="host-controls">
-                                <button 
-                                    className="start-stream-btn"
-                                    onClick={startStream}
-                                >
-                                    Start Stream
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    {joinRequests.map((request, index) => (
-                        <div key={request.id} className="join-request">
-                            <div>
-                                <div style={{ fontWeight: 'bold' }}>@{request.username}</div>
-                                <div style={{ fontSize: '12px', opacity: 0.8 }}>wants to join</div>
-                            </div>
-        
-
-                            <div className="join-actions">
-                                <button 
-                                    className="accept-btn"
-                                    onClick={() => acceptJoinRequest(request.id)}
-                                >
-                                    Accept
-                                </button>
-                                <button 
-                                    className="decline-btn"
-                                    onClick={() => {
-                                        setJoinRequests(prev => 
-                                            prev.filter(req => req.id !== request.id)
-                                        );
-                                    }}
-                                >
-                                    Decline
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-
-                    {status && (
-                        <div className="status-message">
-                            {status}
-                        </div>
+                            {status && (
+                                <div className="status-message">
+                                    {status}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             );
