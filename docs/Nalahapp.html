@@ -1,230 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nalah's Naughty Playhouse - Model Application</title>
     <style>
-        :root {
-            --primary-red: #ff4d4d;
-            --primary-gold: #ffd700;
-            --dark-bg: #1a1a1a;
-            --panel-bg: #2a2a2a;
-            --text-light: #fff;
-            --text-gold: #ffd700;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
+      :root {
+        --primary-red: #ff4d4d;
+        --primary-gold: #ffd700;
+        --dark-bg: #1a1a1a;
+        --panel-bg: rgba(42, 42, 42, 0.95);
+        --text-light: #fff;
+        --text-gold: #ffd700;
+      }
 
-        .logo-container {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: var(--dark-bg);
+        color: var(--text-light);
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
 
-        .logo-container img {
-            max-width: 300px;
-            height: auto;
-        }
+      /* Fire Animation */
+      .fire-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.6;
+        pointer-events: none;
+      }
 
+      .fire {
+        position: absolute;
+        bottom: -50%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle at center,
+          transparent 25%,
+          #ff4500 25%,
+          #ff7800 50%,
+          #ff4500 75%,
+          transparent 75%
+        );
+        animation: fire 3s infinite;
+        filter: blur(20px);
+      }
+
+      @keyframes fire {
+        0%,
+        100% {
+          transform: translateX(-50%) scale(1);
+          opacity: 0.8;
+        }
+        50% {
+          transform: translateX(-50%) scale(1.1);
+          opacity: 1;
+        }
+      }
+
+      .spark {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--primary-gold);
+        border-radius: 50%;
+        animation: spark linear infinite;
+      }
+
+      @keyframes spark {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) scale(0);
+          opacity: 0;
+        }
+      }
+
+      .logo-container {
+        text-align: center;
+        margin-bottom: 2rem;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+      }
+
+      .logo-container img {
+        max-width: 400px;
+        height: auto;
+      }
+
+      .form-container {
+        max-width: 800px;
+        margin: 0 auto 40px auto;
+        background: var(--panel-bg);
+        padding: 2rem;
+        border-radius: 15px;
+        border: 2px solid var(--primary-gold);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.2),
+          0 0 40px rgba(255, 77, 77, 0.1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .form-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--primary-gold),
+          var(--primary-red),
+          var(--primary-gold),
+          transparent
+        );
+        animation: shimmer 3s infinite linear;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--primary-gold);
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5),
+          0 0 20px rgba(255, 77, 77, 0.3);
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--primary-gold);
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--primary-gold);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-light);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary-red);
+        box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      button {
+        background: linear-gradient(45deg, var(--primary-red), #ff6b6b);
+        color: var(--text-light);
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border: 2px solid var(--primary-gold);
+        position: relative;
+        overflow: hidden;
+      }
+
+      button::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 215, 0, 0.3) 0%,
+          transparent 70%
+        );
+        transform: rotate(45deg);
+        animation: button-shine 3s infinite;
+      }
+
+      @keyframes button-shine {
+        0% {
+          transform: rotate(45deg) translateY(-100%);
+        }
+        100% {
+          transform: rotate(45deg) translateY(100%);
+        }
+      }
+
+      button:hover {
+        background: linear-gradient(45deg, #ff6b6b, var(--primary-red));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4);
+      }
+
+      .required {
+        color: var(--primary-red);
+      }
+
+      select {
+        appearance: none;
+        background-image: linear-gradient(
+            45deg,
+            var(--primary-gold) 50%,
+            transparent 50%
+          ),
+          linear-gradient(135deg, transparent 50%, var(--primary-gold) 50%);
+        background-position: calc(100% - 20px) calc(1em + 2px),
+          calc(100% - 15px) calc(1em + 2px);
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
         .form-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: var(--panel-bg);
-            padding: 2rem;
-            border-radius: 15px;
-            border: 2px solid var(--primary-gold);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+          padding: 1rem;
+          margin: 10px;
         }
 
         h1 {
-            text-align: center;
-            color: var(--primary-gold);
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+          font-size: 2rem;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+        .logo-container img {
+          max-width: 300px;
         }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--primary-gold);
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--primary-gold);
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--text-light);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-red);
-            box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        button {
-            background: linear-gradient(45deg, var(--primary-red), #ff6b6b);
-            color: var(--text-light);
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border: 2px solid var(--primary-gold);
-        }
-
-        button:hover {
-            background: linear-gradient(45deg, #ff6b6b, var(--primary-red));
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4);
-        }
-
-        .required {
-            color: var(--primary-red);
-        }
-
-        /* Custom select styling */
-        select {
-            appearance: none;
-            background-image: linear-gradient(45deg, var(--primary-gold) 50%, transparent 50%),
-                            linear-gradient(135deg, transparent 50%, var(--primary-gold) 50%);
-            background-position: calc(100% - 20px) calc(1em + 2px),
-                               calc(100% - 15px) calc(1em + 2px);
-            background-size: 5px 5px, 5px 5px;
-            background-repeat: no-repeat;
-        }
-
-        /* Decorative elements */
-        .decorative-border {
-            position: relative;
-        }
-
-        .decorative-border::before,
-        .decorative-border::after {
-            content: '♥';
-            color: var(--primary-gold);
-            position: absolute;
-            font-size: 1.5rem;
-        }
-
-        .decorative-border::before {
-            left: 10px;
-        }
-
-        .decorative-border::after {
-            right: 10px;
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="fire-container">
+      <div class="fire"></div>
+    </div>
+
     <div class="logo-container">
-        <img src="/api/placeholder/300/150" alt="Nalah's Naughty Playhouse Logo">
+      <img
+        src="NalahVlog/docs/Images/AppLogo.png"
+        alt="Nalah's Naughty Playhouse Logo"
+      />
     </div>
-    
-    <div class="form-container decorative-border">
-        <h1>Model Application</h1>
-        <form id="modelSignup" method="POST">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="name">Full Name <span class="required">*</span></label>
-                    <input type="text" id="name" name="name" required>
-                </div>
 
-                <div class="form-group">
-                    <label for="stageName">Stage Name <span class="required">*</span></label>
-                    <input type="text" id="stageName" name="stageName" required>
-                </div>
+    <div class="form-container">
+      <h1>Model Application</h1>
+      <form id="modelSignup" method="POST">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Full Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required />
+          </div>
 
-                <div class="form-group">
-                    <label for="email">Email Address <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required>
-                </div>
+          <div class="form-group">
+            <label for="stageName"
+              >Stage Name <span class="required">*</span></label
+            >
+            <input type="text" id="stageName" name="stageName" required />
+          </div>
 
-                <div class="form-group">
-                    <label for="phone">Phone Number <span class="required">*</span></label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
+          <div class="form-group">
+            <label for="email"
+              >Email Address <span class="required">*</span></label
+            >
+            <input type="email" id="email" name="email" required />
+          </div>
 
-                <div class="form-group">
-                    <label for="age">Age <span class="required">*</span></label>
-                    <input type="number" id="age" name="age" min="18" required>
-                </div>
+          <div class="form-group">
+            <label for="phone"
+              >Phone Number <span class="required">*</span></label
+            >
+            <input type="tel" id="phone" name="phone" required />
+          </div>
 
-                <div class="form-group">
-                    <label for="location">Location <span class="required">*</span></label>
-                    <input type="text" id="location" name="location" placeholder="City, State/Province" required>
-                </div>
-            </div>
+          <div class="form-group">
+            <label for="age">Age <span class="required">*</span></label>
+            <input type="number" id="age" name="age" min="18" required />
+          </div>
 
-            <div class="form-group">
-                <label for="experience">Experience Level</label>
-                <select id="experience" name="experience">
-                    <option value="">Select experience level</option>
-                    <option value="beginner">Beginner (0-1 years)</option>
-                    <option value="intermediate">Intermediate (1-3 years)</option>
-                    <option value="experienced">Experienced (3+ years)</option>
-                </select>
-            </div>
+          <div class="form-group">
+            <label for="location"
+              >Location <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="location"
+              name="location"
+              placeholder="City, State/Province"
+              required
+            />
+          </div>
+        </div>
 
-            <div class="form-group">
-                <label for="availability">Availability <span class="required">*</span></label>
-                <select id="availability" name="availability" required>
-                    <option value="">Select availability</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="weekends">Weekends only</option>
-                    <option value="flexible">Flexible schedule</option>
-                </select>
-            </div>
+        <div class="form-group">
+          <label for="experience">Experience Level</label>
+          <select id="experience" name="experience">
+            <option value="">Select experience level</option>
+            <option value="beginner">Beginner (0-1 years)</option>
+            <option value="intermediate">Intermediate (1-3 years)</option>
+            <option value="experienced">Experienced (3+ years)</option>
+          </select>
+        </div>
 
-            <div class="form-group">
-                <label for="socialMedia">Social Media Handles</label>
-                <textarea id="socialMedia" name="socialMedia" placeholder="List your relevant social media profiles"></textarea>
-            </div>
+        <div class="form-group">
+          <label for="availability"
+            >Availability <span class="required">*</span></label
+          >
+          <select id="availability" name="availability" required>
+            <option value="">Select availability</option>
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+            <option value="weekends">Weekends only</option>
+            <option value="flexible">Flexible schedule</option>
+          </select>
+        </div>
 
-            <div class="form-group">
-                <label for="about">Tell Us About Yourself <span class="required">*</span></label>
-                <textarea id="about" name="about" placeholder="Share your interests, experience, and why you'd like to join our playhouse" required></textarea>
-            </div>
+        <div class="form-group">
+          <label for="socialMedia">Social Media Handles</label>
+          <textarea
+            id="socialMedia"
+            name="socialMedia"
+            placeholder="List your relevant social media profiles"
+          ></textarea>
+        </div>
 
-            <button type="submit">Submit Application</button>
-        </form>
+        <div class="form-group">
+          <label for="about"
+            >Tell Us About Yourself <span class="required">*</span></label
+          >
+          <textarea
+            id="about"
+            name="about"
+            placeholder="Share your interests, experience, and why you'd like to join our playhouse"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit">Submit Application</button>
+      </form>
     </div>
-</body>
+
+    <script>
+      // Add dynamic sparks
+      function createSpark() {
+        const spark = document.createElement("div");
+        spark.className = "spark";
+        spark.style.left = Math.random() * 100 + "vw";
+        spark.style.animationDuration = Math.random() * 3 + 2 + "s";
+        document.querySelector(".fire-container").appendChild(spark);
+
+        setTimeout(() => {
+          spark.remove();
+        }, 5000);
+      }
+
+      setInterval(createSpark, 200);
+    </script>
+  </body>
 </html>
