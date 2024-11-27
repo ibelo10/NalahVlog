@@ -5,32 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Naughty Nalah's Playhouse" />
     <title>Naughty Nalah's Playhouse</title>
-
-    <!-- Base styles -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
     />
-    <!-- Update CSS paths for both local and live -->
-    <link rel="stylesheet" href="src/css/base.css" />
     <style>
-      /* Inline critical styles */
-      .feature-card {
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        transition: all 0.3s ease;
+      body {
+        background-image: url('src/images/banner.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: black;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .content-wrapper {
+        text-align: center;
+        padding: 2rem;
       }
 
       .main-title {
         font-size: 4rem;
-        background: linear-gradient(45deg, #ff69b4, #ff1493);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        color: white;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
 
       .cta-button {
@@ -40,6 +42,8 @@
         border-radius: 9999px;
         font-weight: 500;
         transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
       }
 
       .cta-button:hover {
@@ -48,43 +52,10 @@
       }
     </style>
   </head>
-  <body class="theme-dark min-h-screen overflow-x-hidden bg-black text-white">
-    <main
-      class="relative min-h-screen flex items-center justify-center px-4 py-16"
-    >
-      <div class="container mx-auto max-w-6xl text-center">
-        <!-- Title Section -->
-        <h1 class="main-title mb-6">Naughty Nalah's Playhouse</h1>
-
-        <p
-          class="text-lg sm:text-xl text-pink-200 mx-auto font-light leading-relaxed max-w-2xl mb-12"
-        >
-          Discover exclusive content and unforgettable experiences with
-          <span class="font-medium text-pink-400">Nalah</span>
-        </p>
-
-        <!-- Features Grid -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12"
-        >
-          <div class="feature-card">
-            <div class="text-4xl mb-4">👄</div>
-            <div class="text-lg font-medium">Exclusive Content</div>
-          </div>
-          <div class="feature-card">
-            <div class="text-4xl mb-4">💫</div>
-            <div class="text-lg font-medium">Private Shows</div>
-          </div>
-          <div class="feature-card">
-            <div class="text-4xl mb-4">✨</div>
-            <div class="text-lg font-medium">Special Requests</div>
-          </div>
-        </div>
-
-        <!-- CTA Button -->
-         
-        <a href="src/pages/home.html" class="cta-button inline-block">Enter Now</a>
-      </div>
-    </main>
+  <body>
+    <div class="content-wrapper">
+      <h1 class="main-title">Naughty Nalah's Playhouse</h1>
+      <a href="src/pages/home.html" class="cta-button">Enter Now</a>
+    </div>
   </body>
 </html>
