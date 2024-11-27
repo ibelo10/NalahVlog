@@ -11,7 +11,7 @@
     />
     <style>
       body {
-        background-image: url('src/images/banner.png');
+        background-image: url('images/banner.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -33,10 +33,11 @@
         color: white;
         margin-bottom: 2rem;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        font-family: Arial, sans-serif;
       }
 
       .cta-button {
-        background: linear-gradient(45deg, #ff1493, #ff69b4);
+        background: transparent;
         color: white;
         padding: 1rem 3rem;
         border-radius: 9999px;
@@ -44,11 +45,16 @@
         transition: all 0.3s ease;
         text-decoration: none;
         display: inline-block;
+        border: 2px solid #FFD700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
       }
 
       .cta-button:hover {
+        background-color: #FFD700;
+        color: black;
         transform: translateY(-2px);
-        box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
       }
     </style>
   </head>
