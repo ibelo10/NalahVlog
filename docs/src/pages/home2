@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naughty Nalah's Playhouse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Oswald:wght@200;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold-color: #FFD700;
+            --dark-bg: #000000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .site-header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-logo a {
+            color: var(--gold-color);
+            text-decoration: none;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--gold-color);
+        }
+
+        .hero-section {
+            background-image: url('../images/banner.png');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .hero-section h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            color: var(--gold-color);
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-section p {
+            color: white;
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .cards-section {
+            padding: 4rem 2rem;
+            background-color: var(--dark-bg);
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--gold-color);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            width: 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card h1 {
+            color: var(--gold-color);
+            margin: 0 0 1rem 0;
+        }
+
+        .price {
+            color: white;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .card-back a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: 2px solid var(--gold-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card-back a:hover {
+            background-color: var(--gold-color);
+            color: black;
+        }
+
+        .site-footer {
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">Nalah's</a>
+            </div>
+            <div class="nav-links">
+                <a href="#fan-group" class="nav-link">Fan Group</a>
+                <a href="#sessions" class="nav-link">Sessions</a>
+                <a href="#store" class="nav-link">Store</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="hero-section">
+            <h1>Welcome to Nalah's Playhouse</h1>
+            <p>Explore exclusive content and join our community</p>
+        </section>
+        <section class="cards-section">
+            <div class="cards-container">
+                <!-- Card 1 -->
+                <div class="card">
+                    <h1>Join My Fan Group</h1>
+                    <span class="price">Premium</span>
+                    <div class="card-back">
+                        <a href="https://onlyfans.com/addicted2m3" target="_blank" rel="noopener noreferrer">Join Now</a>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="card">
+                    <h1>Book Now</h1>
+                    <span class="price">VIP</span>
+                    <div class="card-back">
+                        <a href="#book">Schedule</a>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="card">
+                    <h1>Live Chat Session</h1>
+                    <span class="price">Elite</span>
+                    <div class="card-back">
+                        <a href="#chat">Start Chat</a>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="card">
+                    <h1>Purchase Collection</h1>
+                    <span class="price">Limited</span>
+                    <div class="card-back">
+                        <a href="#collection">View</a>
+                    </div>
+                </div>
+                <!-- Card 5 -->
+                <div class="card">
+                    <h1>My Store</h1>
+                    <span class="price">Exclusive</span>
+                    <div class="card-back">
+                        <a href="#store">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer">
+        <div class="footer-links">
+            <a href="#terms">Terms</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </footer>
+</body>
+</html>
