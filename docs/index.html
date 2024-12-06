@@ -28,12 +28,26 @@
 
         .curtain-left {
             left: 0;
-            transform: translateX(-100%);
+            transform: translateX(0);
+            animation: slideLeft 1.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
         }
 
         .curtain-right {
             right: 0;
-            transform: translateX(100%);
+            transform: translateX(0);
+            animation: slideRight 1.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+        }
+
+        @keyframes slideLeft {
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes slideRight {
+            to {
+                transform: translateX(100%);
+            }
         }
 
         .content {
@@ -128,12 +142,6 @@
             particle.style.animationDelay = Math.random() * 3 + 's';
             document.body.appendChild(particle);
         }
-
-        // Trigger curtain animation
-        document.addEventListener('DOMContentLoaded', () => {
-            const curtains = document.querySelectorAll('.curtain');
-            curtains.forEach(curtain => curtain.style.transform = 'translateX(0)');
-        });
     </script>
 </body>
 </html>
