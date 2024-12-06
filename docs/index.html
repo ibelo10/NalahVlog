@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="5; url='src/pages/home.html'" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="8; url='src/pages/home.html'" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Italianno&family=Montserrat:wght@300&display=swap');
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             height: 100vh;
@@ -14,6 +22,24 @@
             background: #000;
             font-family: 'Cormorant Garamond', serif;
             overflow: hidden;
+            perspective: 1000px;
+            background: radial-gradient(circle at center, #1a1208 0%, #000 100%);
+        }
+
+        .initial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            animation: initialFade 2s forwards;
+        }
+
+        @keyframes initialFade {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
         }
 
         .curtain {
@@ -21,76 +47,191 @@
             top: 0;
             width: 50%;
             height: 100%;
-            background: linear-gradient(45deg, #000 0%, #1a1a1a 100%);
+            background: linear-gradient(45deg, #000 0%, #1a1208 100%);
             transition: transform 1.8s cubic-bezier(0.7, 0, 0.3, 1);
             box-shadow: 0 0 20px rgba(218, 165, 32, 0.2);
+            z-index: 90;
+        }
+
+        .curtain::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(218, 165, 32, 0.05) 2px,
+                rgba(218, 165, 32, 0.05) 4px
+            );
         }
 
         .curtain-left {
             left: 0;
             transform: translateX(0);
-            animation: slideLeft 1.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+            animation: slideLeft 1.8s cubic-bezier(0.7, 0, 0.3, 1) 0.5s forwards;
         }
 
         .curtain-right {
             right: 0;
             transform: translateX(0);
-            animation: slideRight 1.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+            animation: slideRight 1.8s cubic-bezier(0.7, 0, 0.3, 1) 0.5s forwards;
         }
 
         @keyframes slideLeft {
-            to {
-                transform: translateX(-100%);
-            }
+            to { transform: translateX(-100%) rotateY(20deg); }
         }
 
         @keyframes slideRight {
-            to {
-                transform: translateX(100%);
-            }
+            to { transform: translateX(100%) rotateY(-20deg); }
         }
 
         .content {
             text-align: center;
+            z-index: 10;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .welcome {
+            color: #DAA520;
+            font-family: 'Italianno', cursive;
+            font-size: clamp(48px, 10vw, 72px);
             opacity: 0;
-            transform: translateY(20px);
-            animation: reveal 1.5s ease-out 1.8s forwards;
+            transform: translateY(-50px) rotateX(-90deg);
+            animation: revealWelcome 1.5s ease-out 1.8s forwards;
+            text-shadow: 0 0 15px rgba(218, 165, 32, 0.5);
+            position: relative;
+        }
+
+        .welcome::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #DAA520, transparent);
+            animation: lineExpand 1.5s ease-out 2.3s forwards;
+        }
+
+        @keyframes lineExpand {
+            to { width: 80%; }
         }
 
         .main-title {
             color: #DAA520;
-            font-size: 48px;
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+            font-size: clamp(36px, 8vw, 64px);
+            margin: 20px 0;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: revealTitle 1.5s ease-out 2.3s forwards;
+            text-shadow: 
+                0 0 10px rgba(218, 165, 32, 0.5),
+                0 0 20px rgba(218, 165, 32, 0.3),
+                0 0 30px rgba(218, 165, 32, 0.1);
+            letter-spacing: 2px;
             font-weight: 600;
+            word-wrap: break-word;
         }
 
         .subtitle {
             display: block;
-            font-size: 24px;
-            margin-top: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(16px, 4vw, 28px);
             color: #B8860B;
-            font-weight: 400;
-            letter-spacing: 3px;
+            font-weight: 300;
+            letter-spacing: clamp(4px, 1vw, 8px);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: revealSubtitle 1.5s ease-out 2.8s forwards;
         }
 
-        @keyframes reveal {
+        @keyframes revealWelcome {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        @keyframes revealTitle {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes revealSubtitle {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        body::before {
+        .golden-frame {
+            position: absolute;
+            width: min(90%, calc(100% - 40px));
+            height: min(90%, calc(100% - 40px));
+            pointer-events: none;
+            opacity: 0;
+            animation: frameReveal 1.5s ease-out 3.3s forwards;
+        }
+
+        .golden-frame::before, .golden-frame::after {
             content: '';
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-            opacity: 0.7;
-            z-index: -1;
+            right: 0;
+            bottom: 0;
+        }
+
+        .golden-frame::before {
+            border: 2px solid rgba(218, 165, 32, 0.8);
+            filter: drop-shadow(0 0 10px rgba(218, 165, 32, 0.5));
+        }
+
+        .golden-frame::after {
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            margin: -5px;
+        }
+
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #DAA520;
+            opacity: 0;
+        }
+
+        .corner-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .corner-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .corner-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        .golden-frame .corner {
+            animation: cornerReveal 0.5s ease-out 3.8s forwards;
+        }
+
+        @keyframes cornerReveal {
+            from { opacity: 0; transform: scale(0); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes frameReveal {
+            from {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .gold-particle {
@@ -99,6 +240,7 @@
             height: 3px;
             background: #DAA520;
             border-radius: 50%;
+            filter: blur(1px);
             animation: float 3s ease-in-out infinite;
             opacity: 0;
         }
@@ -106,42 +248,99 @@
         @keyframes float {
             0%, 100% { 
                 opacity: 0;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
             50% { 
                 opacity: 0.8;
-                transform: translateY(-20px);
+                transform: translateY(-20px) scale(1.2);
             }
         }
 
-        .golden-border {
+        .shine {
             position: absolute;
-            border: 2px solid rgba(218, 165, 32, 0.3);
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                transparent 0%,
+                rgba(218, 165, 32, 0.1) 45%,
+                rgba(218, 165, 32, 0.3) 50%,
+                rgba(218, 165, 32, 0.1) 55%,
+                transparent 100%);
+            animation: shine 3s infinite;
             pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.6) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .background-texture {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, rgba(218, 165, 32, 0.05) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(218, 165, 32, 0.05) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(218, 165, 32, 0.05) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(218, 165, 32, 0.05) 75%);
+            background-size: 20px 20px;
+            animation: backgroundMove 30s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes backgroundMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(20px) translateY(20px); }
         }
     </style>
 </head>
 <body>
-    <div class="golden-border"></div>
+    <div class="initial-overlay"></div>
+    <div class="background-texture"></div>
+    <div class="vignette"></div>
+    <div class="shine"></div>
     <div class="curtain curtain-left"></div>
     <div class="curtain curtain-right"></div>
+    <div class="golden-frame">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+    </div>
     <div class="content">
-        <div class="main-title">Welcome to</div>
+        <div class="welcome">Welcome to</div>
         <div class="main-title">Nalah's Playhouse</div>
-        <span class="subtitle">Where Sophistication Meets Desire</span>
+        <span class="subtitle">WHERE SOPHISTICATION MEETS DESIRE</span>
     </div>
     <script>
-        // Add floating gold particles
-        for(let i = 0; i < 25; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'gold-particle';
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.top = Math.random() * 100 + 'vh';
-            particle.style.animationDelay = Math.random() * 3 + 's';
-            document.body.appendChild(particle);
-        }
+        const createParticles = () => {
+            const particleCount = window.innerWidth < 768 ? 15 : 25;
+            for(let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'gold-particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                document.body.appendChild(particle);
+            }
+        };
+
+        createParticles();
     </script>
 </body>
 </html>
